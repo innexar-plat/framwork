@@ -80,9 +80,10 @@ def test_list_products_success_empty(client: TestClient) -> None:
 
 
 def test_list_products_success_with_data(client: TestClient) -> None:
+    from datetime import UTC, datetime
+
     from app.core.database import get_db
     from app.models import StripeProduct
-    from datetime import datetime, UTC
 
     async def override_get_db():
         yield MagicMock()
