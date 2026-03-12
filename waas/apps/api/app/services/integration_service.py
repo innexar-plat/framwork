@@ -1,6 +1,7 @@
 """Integration service: create/update workspace (tenant) via external API."""
 
 import logging
+from datetime import UTC, datetime
 from uuid import uuid4
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -12,6 +13,7 @@ from app.repositories.user_tenant_repository import UserTenantRepository
 from app.repositories.workspace_external_repository import WorkspaceExternalRepository
 from app.schemas.integration import CreateWorkspaceRequest, UpdateWorkspaceRequest
 from app.services.catalog_service import CatalogService
+from app.services.cloudflare_service import CloudflareService
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +30,42 @@ class IntegrationService:
         self._user_repo = UserRepository(db)
         self._user_tenant_repo = UserTenantRepository(db)
         self._catalog = CatalogService(db)
+        self._cf = CloudflareService()
+
+    async def _unique_slug(self, requested: str) -> str:
+        """Return a unique slug across tenant slug/subdomain fields."""
+        normalized = (requested or "").strip().lower()
+        base = "".join(c for c in normalized if c.isalnum() or c == "-") or "site"
+        base = base[:50]
+        for n in range(100):
+            candidate = f"{base}-{n}" if n else base
+            taken = await self._tenant_repo.slug_or_subdomain_taken(candidate)
+            if not taken:
+                return candidate
+        return f"{base}-{uuid4().hex[:8]}"
+
+    async def _ensure_dns_record(self, tenant: Tenant) -> None:
+        """Create DNS record for the tenant if missing and store cf_record_id."""
+        if tenant.cf_record_id:
+            return
+        subdomain = (tenant.subdomain or tenant.slug or "").strip().lower()
+        if not subdomain:
+            raise ValueError("Tenant slug/subdomain is required for DNS provisioning")
+        cf_record_id = await self._cf.create_subdomain(subdomain)
+        tenant.cf_record_id = cf_record_id
+        self._db.add(tenant)
+        await self._db.flush()
+
+    async def _remove_dns_record(self, tenant: Tenant) -> None:
+        """Delete DNS record when tenant has a stored Cloudflare record id."""
+        if not tenant.cf_record_id:
+            return
+        deleted = await self._cf.delete_subdomain(tenant.cf_record_id)
+        if not deleted:
+            raise RuntimeError("Failed to remove Cloudflare DNS record")
+        tenant.cf_record_id = None
+        self._db.add(tenant)
+        await self._db.flush()
 
     async def _resolve_plan_and_niche(
         self, plan_code: str | None, niche_code: str | None
@@ -46,18 +84,25 @@ class IntegrationService:
         )
         if existing:
             tenant = await self._tenant_repo.get_by_id(existing.tenant_id)
+            if tenant and tenant.status == "active":
+                await self._ensure_dns_record(tenant)
             return (tenant, existing, None)
 
         plan_id, niche_id = await self._resolve_plan_and_niche(body.plan_code, body.niche_code)
+        slug = await self._unique_slug(body.slug)
         tenant = Tenant(
             id=uuid4().hex,
             name=body.name,
-            slug=body.slug,
+            slug=slug,
+            subdomain=slug,
             status="active",
             plan_id=plan_id,
             niche_id=niche_id,
+            provisioning_status="active",
+            provisioned_at=datetime.now(UTC),
         )
         await self._tenant_repo.add(tenant)
+        await self._ensure_dns_record(tenant)
 
         we = WorkspaceExternal(
             id=uuid4().hex,
@@ -125,6 +170,14 @@ class IntegrationService:
         if not pair:
             return None
         tenant, _ = pair
+
+        if status == "suspended":
+            await self._remove_dns_record(tenant)
+        elif status == "active":
+            if not tenant.subdomain and tenant.slug:
+                tenant.subdomain = tenant.slug
+            await self._ensure_dns_record(tenant)
+
         tenant.status = status
         await self._db.flush()
         await self._db.refresh(tenant)
