@@ -1,0 +1,242 @@
+---
+description: WaaS (Website as a Service) — identity, stack, folder structure, database, auth, API/frontend patterns, provisioning, integrations. Apply when working in waas/ or on WaaS features.
+alwaysApply: true
+---
+
+# WaaS — Project Rules for Cursor AI
+
+## IDENTIDADE DO PROJETO
+
+Você está trabalhando no **WaaS (Website as a Service)** — uma plataforma SaaS multi-tenant para venda de sites por assinatura com foco no mercado USA / Florida.
+
+O operador (dono da plataforma) vende sites para negócios locais (imobiliárias, clínicas, advogados, restaurantes, etc.). Cada cliente (tenant) recebe um subdomínio, um painel para gerenciar seu site, e módulos ativados conforme o plano contratado.
+
+---
+
+## STACK OBRIGATÓRIA
+
+```
+Backend  → FastAPI (Python 3.11) + SQLAlchemy async + PostgreSQL + Alembic
+Auth     → JWT com python-jose + bcrypt (passlib) + SlowAPI (rate limit)
+Frontend → Next.js 14 (App Router) + React 18 + TypeScript + Tailwind CSS
+Infra    → Docker Compose (api + admin + site + postgres)
+DNS      → Cloudflare API v4
+Git      → GitHub API (fork de template repo)
+Email    → aiosmtplib (SMTP) ou SendGrid
+Cripto   → cryptography.fernet (chaves de integração por tenant)
+```
+
+Nunca sugira trocar de stack. Nunca use Express, Django, Prisma, ou outras alternativas.
+
+---
+
+## ESTRUTURA DE PASTAS (COMPLETA)
+
+```
+waas/
+├── .env                          ← variáveis de ambiente (nunca commitar)
+├── .env.example                  ← template de variáveis
+├── docker-compose.yml            ← serviços: api (8001), admin (3001), site (3002), postgres (5433)
+├── .cursorrules                  ← este arquivo
+├── IMPLEMENTACAO.md              ← documentação original do que já existe
+├── WAAS_IMPLEMENTACAO_IA.md      ← plano completo com prompts por fase
+│
+├── apps/
+│   ├── api/                      ← Backend FastAPI
+│   │   ├── app/
+│   │   │   ├── api/
+│   │   │   │   └── v1/
+│   │   │   │       ├── auth.py             ← login, refresh, /me
+│   │   │   │       ├── blog.py             ← CRUD blog posts
+│   │   │   │       ├── property.py        ← CRUD property items
+│   │   │   │       ├── leads.py            ← CRUD leads
+│   │   │   │       ├── schedule.py         ← CRUD schedule items
+│   │   │   │       ├── media.py            ← upload + CRUD media
+│   │   │   │       ├── tenant.py          ← settings, pages, users do tenant
+│   │   │   │       ├── integration.py     ← workspace externos via API Key
+│   │   │   │       ├── catalog/            ← CRUD planos, nichos, módulos, matriz
+│   │   │   │       │   ├── plans.py
+│   │   │   │       │   ├── niches.py
+│   │   │   │       │   ├── modules.py
+│   │   │   │       │   └── matrix.py
+│   │   │   │       └── platform/           ← visão do operador
+│   │   │   │           ├── tenants.py     ← lista todos os tenants
+│   │   │   │           ├── audit.py        ← logs de auditoria
+│   │   │   │           ├── briefings.py   ← [NOVO] CRUD briefings
+│   │   │   │           ├── provision.py   ← [NOVO] provisionamento automático
+│   │   │   │           └── integrations.py ← [NOVO] config global (CF, Git, SMTP)
+│   │   │   ├── config/
+│   │   │   │   └── settings.py            ← todas as env vars via Pydantic Settings
+│   │   │   ├── core/
+│   │   │   │   ├── deps.py                ← CurrentUserId, RequiredTenantId, etc.
+│   │   │   │   ├── security.py            ← hash, verify, create_token
+│   │   │   │   ├── module_guard.py        ← require_active_module()
+│   │   │   │   ├── catalog_admin.py        ← CatalogAdminUserId
+│   │   │   │   ├── rate_limit.py          ← SlowAPI config
+│   │   │   │   └── i18n.py                ← internacionalização
+│   │   │   ├── models/                    ← SQLAlchemy models (um arquivo por modelo)
+│   │   │   ├── repositories/              ← um arquivo por model
+│   │   │   ├── schemas/                   ← Pydantic schemas, um arquivo por domínio
+│   │   │   ├── services/
+│   │   │   │   ├── catalog_service.py     ← get_active_module_codes_for_tenant()
+│   │   │   │   ├── cloudflare_service.py  ← [NOVO] create/delete subdomain
+│   │   │   │   ├── git_service.py         ← [NOVO] fork template repo
+│   │   │   │   ├── email_service.py       ← [NOVO] welcome + notificações
+│   │   │   │   ├── integration_service.py ← [NOVO] criptografia de chaves
+│   │   │   │   └── provisioning_service.py ← [NOVO] orquestrador dos 10 passos
+│   │   │   └── main.py                    ← FastAPI app, registra todos os routers
+│   │   ├── alembic/
+│   │   │   └── versions/                  ← migrations 001–013 existentes, 014+ novos
+│   │   ├── tests/
+│   │   ├── requirements.txt
+│   │   └── Dockerfile
+│   │
+│   ├── admin/                    ← Frontend Next.js (painel do operador + painel do tenant)
+│   │   └── src/
+│   │       ├── app/
+│   │       │   ├── login/page.tsx
+│   │       │   ├── onboarding/page.tsx    ← [NOVO] portal público de briefing
+│   │       │   ├── platform/              ← painel do operador
+│   │       │   │   ├── page.tsx
+│   │       │   │   ├── tenants/
+│   │       │   │   ├── briefings/page.tsx ← [NOVO]
+│   │       │   │   ├── provision/
+│   │       │   │   ├── audit/page.tsx
+│   │       │   │   ├── integrations/page.tsx ← [NOVO]
+│   │       │   │   └── settings/page.tsx
+│   │       │   ├── admin/
+│   │       │   │   └── catalog/page.tsx
+│   │       │   └── app/                   ← painel do tenant (cliente)
+│   │       │       ├── page.tsx
+│   │       │       ├── blog/, properties/, pages/, leads/, schedule/, media/
+│   │       │       ├── reviews/, payments/, team/, faq/, menu/, locations/, newsletter/
+│   │       │       ├── integrations/, seo/, users/, settings/, billing/
+│   │       ├── components/
+│   │       │   ├── layouts/ (PlatformLayout, TenantLayout)
+│   │       │   ├── ui/
+│   │       │   └── shared/
+│   │       └── lib/ (api-client.ts, tenant-api.ts, auth-context.tsx)
+│   │
+│   └── site/                     ← [NOVO] Site público por tenant
+│       └── src/
+│           ├── app/ (layout, page, blog/, [pageSlug]/, sitemap)
+│           ├── lib/ (tenant.ts, api.ts)
+│           └── components/ (templates/, blocks/)
+```
+
+---
+
+## BANCO DE DADOS
+
+### Padrões absolutos
+- Todos os IDs são `String(32)`, gerados com `uuid.uuid4().hex` (UUID sem hífens)
+- Todas as FKs seguem o mesmo tipo `String(32)`
+- Timestamps: `DateTime(timezone=True)`, sempre com `server_default=func.now()`
+- Enums: usar `SQLAlchemy Enum` com `values_callable` para compatibilidade
+- Migrations: arquivos em `apps/api/alembic/versions/`, nomenclatura `NNN_descricao.py`
+
+### Tabelas existentes (migrations 001–013)
+`users`, `tenants`, `user_tenants`, `plans`, `niches`, `modules`, `plan_niche_modules`, `blog_posts`, `site_pages`, `property_items`, `leads`, `schedule_items`, `media_items`, `catalog_audit_logs`, `workspace_externals`, `integration_apps`
+
+### Tabelas a criar (migrations 014+)
+- 014: `tenants` (ALTER) — subdomain, custom_domain, cf_record_id, provisioning_status, provisioned_at, git_repo_url, welcome_email_sent
+- 015: `briefings` — client_name, client_email, plan_code, niche_code, slug_requested, status, tenant_id (FK nullable), etc.
+- 016: `tenant_integrations` — tenant_id, integration_code, config_encrypted, config_public (UniqueConstraint tenant_id + integration_code)
+- 017: `provisioning_logs` — briefing_id, step_number, step_name, status, message
+- 018–024: `review_items`, `team_members`, `faq_categories`/`faq_items`, `menu_categories`/`menu_items`, `locations`, `newsletter_subscribers`, `stripe_products`
+
+---
+
+## AUTENTICAÇÃO E AUTORIZAÇÃO
+
+- **JWT:** Access token: `sub`, `tenant_id`, `role`, `type: "access"`. Refresh: `sub`, `type: "refresh"`. Frontend: `localStorage` com `waas-access-token` e `waas-refresh-token`. Em 401: tentar refresh e repetir request.
+- **Deps (core/deps.py):** `CurrentUserId`, `TenantIdFromToken`, `RoleFromToken`, `RequiredTenantId`, `CatalogAdminUserId`
+- **Módulos:** `require_active_module("codigo")` nos routers; retorna 403 se módulo não ativo para o tenant.
+- **Escopo:** Todo query de dado de tenant DEVE incluir `WHERE tenant_id = {tenant_id_do_jwt}`. Nunca retornar dados de outro tenant.
+
+---
+
+## PADRÃO DE RESPOSTA DA API
+
+```python
+# SEMPRE:
+{ "success": True, "data": <payload>, "error": None }
+{ "success": False, "data": None, "error": { "code": "NOT_FOUND", "message": "..." } }
+# Helpers: ok(data), err(code, message, status_code)
+```
+
+---
+
+## PADRÕES DE CÓDIGO — BACKEND
+
+- **Módulo completo:** models/nome.py, schemas/nome.py, repositories/nome_repository.py, services/nome_service.py (se necessário), api/v1/nome.py
+- **Repository:** get_by_id(id, tenant_id), list(tenant_id, skip, limit), create(tenant_id, data), update(obj, data), delete(obj). Sempre filtrar por tenant_id onde aplicável.
+- **Router:** Validar input, Depends(RequiredTenantId), Depends(require_active_module("codigo")), chamar repo/service, retornar ok(...) ou err(...).
+
+---
+
+## PADRÕES DE CÓDIGO — FRONTEND
+
+- **API:** lib/tenant-api.ts e api-client.ts; token em localStorage; em 401 tentar refresh e retry; checar json.success e json.error.
+- **UI:** Tailwind puro. Dark: bg-[#0a0b0f], bg-[#111318], border-[#1e2230]. Accent: #4f6ef7. Fontes: Syne (títulos), DM Sans (corpo). Badges: verde=ativo, laranja=trial, vermelho=erro.
+- **Layouts:** PlatformLayout (operador), TenantLayout (cliente). Sidebar do tenant filtra por enabled_modules de /auth/me.
+- **Auth:** useAuth() → user, tenant, role, globalRole, enabledModules, isLoading.
+
+---
+
+## VARIÁVEIS DE AMBIENTE
+
+- **api:** DATABASE_URL, JWT_*, DEBUG, LOG_LEVEL, CORS_ORIGINS, PANEL_BASE_URL, SITE_BASE_DOMAIN, ENCRYPTION_KEY, CF_*, GIT_*, SMTP_*, MEDIA_*
+- **admin:** NEXT_PUBLIC_API_URL
+- **site:** WAAS_API_URL, SITE_BASE_DOMAIN
+
+---
+
+## ENDPOINTS
+
+- **Existentes:** /auth/login, refresh, /me; /catalog/plans, niches, modules; /admin/catalog/*; /platform/tenants, audit; /tenant/settings, pages, users; /blog/posts, /property/items, /leads, /schedule/items, /media/*; /integration/workspaces (API Key).
+- **A criar:** /platform/briefings, /platform/provision, /platform/provision/{id}/status, /platform/tenants/{id}/details; /tenant/integrations, /tenant/dashboard-summary; /reviews, /team/members, /faq/*, /menu/*, /locations, /newsletter/subscribers, /payments/products; /public/tenant/{slug}, /public/{slug}/posts|pages|reviews, POST /public/{slug}/leads, /public/check-slug/{slug}.
+
+---
+
+## MÓDULOS
+
+Existentes: blog, property, leads, schedule, media. Novos (prioridade): reviews, stripe_payments, team, map_locations, chat_widget, faq, menu, newsletter, gallery, events, analytics_dash.
+
+---
+
+## NICHOS (USA / FLORIDA)
+
+real_estate, mortgage, law_firm, medical_dental, beauty_spa, restaurant, home_services, insurance, personal_trainer, immigration, accountant, cleaning, auto_dealer, event_venue, ecommerce — cada um com módulos prioritários definidos.
+
+---
+
+## FLUXO DE PROVISIONAMENTO (10 PASSOS)
+
+1) Buscar briefing, status == 'pending'. 2) Gerar slug único. 3) Criar Tenant (status='provisioning'). 4) CloudflareService.create_subdomain(slug). 5) GitService.create_site_repo(slug). 6) Gerar senha temporária. 7) Criar User. 8) Criar UserTenant (role=admin). 9) EmailService.send_welcome_tenant. 10) tenant.provisioning_status='active', briefing.status='provisioned'. Registrar cada passo em provisioning_logs; em falha, provisioning_status='failed'. Frontend: polling em /platform/provision/{id}/status a cada 2s.
+
+---
+
+## INTEGRAÇÕES
+
+- **Por tenant:** tenant_integrations; sensíveis criptografados (Fernet). Códigos: google_oauth, meta_pixel, stripe, google_maps, whatsapp, mailchimp, ga4, google_reviews, calendly.
+- **Plataforma:** CF_*, GIT_*, SMTP_*, SLACK_WEBHOOK_URL, ENCRYPTION_KEY em /platform/integrations.
+
+---
+
+## REGRAS ABSOLUTAS (NUNCA VIOLAR)
+
+1. Isolamento de tenant: toda query com `WHERE tenant_id = X`.
+2. IDs: sempre `uuid.uuid4().hex`.
+3. Resposta API: sempre `{ success, data, error }`.
+4. Módulos: sempre `require_active_module()` nas rotas de módulo.
+5. Senhas: nunca logar ou retornar.
+6. Chaves de integração: nunca retornar config_encrypted; apenas configured: true.
+7. Migrations: nunca alterar 001–013; criar novas.
+8. Imports e arquivos na estrutura definida.
+9. TypeScript: tipar tudo; evitar any.
+10. Stack: não sugerir tecnologias fora da stack.
+
+---
+
+*WaaS Platform — Project Rules v1.0 — USA/Florida Focus*

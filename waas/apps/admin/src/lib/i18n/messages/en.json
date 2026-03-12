@@ -1,0 +1,183 @@
+{
+  "common": {
+    "language": "Language",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add"
+  },
+  "home": {
+    "title": "WaaS Admin",
+    "subtitle": "Tenant panel",
+    "catalogAdmin": "Catalog admin",
+    "logout": "Log out"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "settings": "Settings",
+    "catalog": "Catalog",
+    "platformTitle": "WaaS Platform",
+    "platformDashboard": "Dashboard",
+    "briefings": "Briefings",
+    "tenants": "Tenants",
+    "audit": "Audit",
+    "platformIntegrations": "Integrations",
+    "platformSettings": "Platform settings",
+    "goToWorkspace": "My workspace",
+    "goToPlatform": "Platform admin",
+    "properties": "Properties",
+    "blog": "Blog",
+    "leads": "Leads",
+    "schedule": "Schedule",
+    "media": "Media",
+    "reviews": "Reviews",
+    "integrations": "Integrations",
+    "pages": "Pages",
+    "users": "Users",
+    "billing": "Billing"
+  },
+  "platform": {
+    "dashboardTitle": "Platform dashboard",
+    "tenantsTitle": "Tenants",
+    "auditTitle": "Audit log",
+    "settingsTitle": "Platform settings",
+    "noTenants": "No tenants yet",
+    "noAudit": "No audit entries",
+    "viewList": "View list",
+    "viewLog": "View log",
+    "recentCount": "Recent"
+  },
+  "footer": {
+    "rights": "All rights reserved.",
+    "tenantPanel": "Tenant panel"
+  },
+  "dashboard": {
+    "welcome": "Welcome",
+    "overview": "Overview",
+    "quickActions": "Quick actions",
+    "goToCatalog": "Go to catalog",
+    "recentActivity": "Recent activity",
+    "noActivity": "No recent activity",
+    "leads": "Leads",
+    "properties": "Properties",
+    "posts": "Posts",
+    "schedule": "Schedule",
+    "viewAll": "View all"
+  },
+  "auth": {
+    "login": "Log in",
+    "email": "Email",
+    "password": "Password",
+    "loginError": "Invalid email or password"
+  },
+  "catalog": {
+    "plans": "Plans",
+    "niches": "Niches",
+    "modules": "Modules",
+    "matrix": "Plan × Niche × Module",
+    "code": "Code",
+    "name": "Name",
+    "description": "Description",
+    "isActive": "Active",
+    "sortOrder": "Order",
+    "confirmDelete": "Are you sure you want to delete this item?",
+    "addPlan": "Add plan",
+    "addNiche": "Add niche",
+    "addModule": "Add module",
+    "addMatrixRow": "Add matrix row",
+    "editPlan": "Edit plan",
+    "editNiche": "Edit niche",
+    "editModule": "Edit module",
+    "planId": "Plan",
+    "nicheId": "Niche",
+    "moduleId": "Module",
+    "codeAndNameRequired": "Code and name are required",
+    "planNicheModuleRequired": "Plan, Niche and Module are required",
+    "parentIdOptional": "Parent ID (optional)"
+  },
+  "property": {
+    "title": "Title",
+    "address": "Address",
+    "status": "Status",
+    "addProperty": "Add property",
+    "confirmDelete": "Are you sure you want to delete this property?"
+  },
+  "blog": {
+    "title": "Title",
+    "slug": "Slug",
+    "content": "Content",
+    "status": "Status",
+    "addPost": "Add post",
+    "editPost": "Edit post",
+    "confirmDelete": "Are you sure you want to delete this post?",
+    "filterByStatus": "Filter by status"
+  },
+  "leads": {
+    "name": "Name",
+    "email": "Email",
+    "source": "Source",
+    "message": "Message",
+    "addLead": "Add lead",
+    "viewLead": "View",
+    "detail": "Lead detail"
+  },
+  "schedule": {
+    "title": "Title",
+    "startAt": "Start",
+    "endAt": "End",
+    "status": "Status",
+    "contactName": "Contact name",
+    "contactEmail": "Contact email",
+    "notes": "Notes",
+    "addItem": "Add item",
+    "editItem": "Edit item",
+    "confirmDelete": "Are you sure you want to delete this item?"
+  },
+  "reviews": {
+    "title": "Reviews",
+    "empty": "No reviews yet. Add your first one!",
+    "add": "Add Review",
+    "edit": "Edit Review",
+    "author": "Author name",
+    "rating": "Rating",
+    "text": "Review text",
+    "photo": "Author photo URL",
+    "source": "Source",
+    "source_manual": "Manual",
+    "source_google": "Google",
+    "publish_now": "Publish immediately",
+    "published": "Published",
+    "draft": "Draft",
+    "confirmDelete": "Are you sure you want to delete this review?"
+  },
+  "media": {
+    "name": "Name",
+    "storageKey": "Storage key",
+    "mimeType": "Type",
+    "sizeBytes": "Size",
+    "confirmDelete": "Are you sure you want to delete this item?",
+    "upload": "Upload file"
+  },
+  "settings": {
+    "siteSettings": "Site name, logo, and SEO.",
+    "siteName": "Site name",
+    "logoUrl": "Logo URL",
+    "metaTitle": "Default meta title",
+    "metaDescription": "Default meta description"
+  },
+  "pages": {
+    "title": "Static pages",
+    "addPage": "Add page",
+    "editPage": "Edit page",
+    "confirmDelete": "Are you sure you want to delete this page?"
+  },
+  "tenantUsers": {
+    "title": "Team members",
+    "email": "Email",
+    "role": "Role",
+    "invite": "Invite",
+    "confirmRemove": "Remove this member?"
+  }
+}

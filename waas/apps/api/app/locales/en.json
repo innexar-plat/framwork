@@ -1,0 +1,24 @@
+{
+  "auth": {
+    "invalid_credentials": "Invalid email or password",
+    "invalid_refresh_token": "Invalid or expired refresh token"
+  },
+  "deps": {
+    "missing_authorization": "Missing or invalid Authorization header",
+    "invalid_token": "Invalid or expired token",
+    "invalid_token_payload": "Invalid token payload"
+  },
+  "integration": {
+    "missing_api_key": "Missing X-Api-Key or X-Api-Secret header",
+    "invalid_api_key": "Invalid API key",
+    "invalid_api_secret": "Invalid API secret",
+    "workspace_not_found": "Workspace not found"
+  },
+  "module_guard": {
+    "tenant_required": "Tenant context is required",
+    "module_not_enabled": "This module is not enabled for your plan"
+  },
+  "catalog_admin": {
+    "forbidden": "Catalog admin access required"
+  }
+}

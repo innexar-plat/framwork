@@ -1,0 +1,183 @@
+{
+  "common": {
+    "language": "Idioma",
+    "loading": "Cargando...",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "add": "Añadir"
+  },
+  "home": {
+    "title": "WaaS Admin",
+    "subtitle": "Panel del tenant",
+    "catalogAdmin": "Admin del catálogo",
+    "logout": "Cerrar sesión"
+  },
+  "nav": {
+    "dashboard": "Panel",
+    "settings": "Configuración",
+    "catalog": "Catálogo",
+    "platformTitle": "WaaS Plataforma",
+    "platformDashboard": "Panel",
+    "briefings": "Briefings",
+    "tenants": "Tenants",
+    "audit": "Auditoría",
+    "platformIntegrations": "Integraciones",
+    "platformSettings": "Config. de la plataforma",
+    "goToWorkspace": "Mi workspace",
+    "goToPlatform": "Admin de la plataforma",
+    "properties": "Propiedades",
+    "blog": "Blog",
+    "leads": "Leads",
+    "schedule": "Agenda",
+    "media": "Medios",
+    "reviews": "Reseñas",
+    "integrations": "Integraciones",
+    "pages": "Páginas",
+    "users": "Usuarios",
+    "billing": "Facturación"
+  },
+  "platform": {
+    "dashboardTitle": "Panel de la plataforma",
+    "tenantsTitle": "Tenants",
+    "auditTitle": "Registro de auditoría",
+    "settingsTitle": "Configuración de la plataforma",
+    "noTenants": "Aún no hay tenants",
+    "noAudit": "Sin entradas de auditoría",
+    "viewList": "Ver lista",
+    "viewLog": "Ver log",
+    "recentCount": "Recientes"
+  },
+  "footer": {
+    "rights": "Todos los derechos reservados.",
+    "tenantPanel": "Panel del tenant"
+  },
+  "dashboard": {
+    "welcome": "Bienvenido",
+    "overview": "Resumen",
+    "quickActions": "Acciones rápidas",
+    "goToCatalog": "Ir al catálogo",
+    "recentActivity": "Actividad reciente",
+    "noActivity": "Sin actividad reciente",
+    "leads": "Leads",
+    "properties": "Propiedades",
+    "posts": "Posts",
+    "schedule": "Agenda",
+    "viewAll": "Ver todo"
+  },
+  "auth": {
+    "login": "Iniciar sesión",
+    "email": "Correo",
+    "password": "Contraseña",
+    "loginError": "Correo o contraseña no válidos"
+  },
+  "catalog": {
+    "plans": "Planes",
+    "niches": "Nichos",
+    "modules": "Módulos",
+    "matrix": "Plan × Nicho × Módulo",
+    "code": "Código",
+    "name": "Nombre",
+    "description": "Descripción",
+    "isActive": "Activo",
+    "sortOrder": "Orden",
+    "confirmDelete": "¿Está seguro de que desea eliminar este elemento?",
+    "addPlan": "Añadir plan",
+    "addNiche": "Añadir nicho",
+    "addModule": "Añadir módulo",
+    "addMatrixRow": "Añadir fila de matriz",
+    "editPlan": "Editar plan",
+    "editNiche": "Editar nicho",
+    "editModule": "Editar módulo",
+    "planId": "Plan",
+    "nicheId": "Nicho",
+    "moduleId": "Módulo",
+    "codeAndNameRequired": "Código y nombre son obligatorios",
+    "planNicheModuleRequired": "Plan, Nicho y Módulo son obligatorios",
+    "parentIdOptional": "ID del padre (opcional)"
+  },
+  "property": {
+    "title": "Título",
+    "address": "Dirección",
+    "status": "Estado",
+    "addProperty": "Añadir propiedad",
+    "confirmDelete": "¿Está seguro de que desea eliminar esta propiedad?"
+  },
+  "blog": {
+    "title": "Título",
+    "slug": "Slug",
+    "content": "Contenido",
+    "status": "Estado",
+    "addPost": "Añadir entrada",
+    "editPost": "Editar entrada",
+    "confirmDelete": "¿Está seguro de que desea eliminar esta entrada?",
+    "filterByStatus": "Filtrar por estado"
+  },
+  "leads": {
+    "name": "Nombre",
+    "email": "Correo",
+    "source": "Origen",
+    "message": "Mensaje",
+    "addLead": "Añadir lead",
+    "viewLead": "Ver",
+    "detail": "Detalle del lead"
+  },
+  "schedule": {
+    "title": "Título",
+    "startAt": "Inicio",
+    "endAt": "Fin",
+    "status": "Estado",
+    "contactName": "Nombre del contacto",
+    "contactEmail": "Correo del contacto",
+    "notes": "Notas",
+    "addItem": "Añadir item",
+    "editItem": "Editar item",
+    "confirmDelete": "¿Está seguro de que desea eliminar este item?"
+  },
+  "reviews": {
+    "title": "Reseñas",
+    "empty": "Sin reseñas aún. ¡Añade la primera!",
+    "add": "Agregar Reseña",
+    "edit": "Editar Reseña",
+    "author": "Nombre del autor",
+    "rating": "Calificación",
+    "text": "Texto",
+    "photo": "URL de la foto",
+    "source": "Origen",
+    "source_manual": "Manual",
+    "source_google": "Google",
+    "publish_now": "Publicar ahora",
+    "published": "Publicado",
+    "draft": "Borrador",
+    "confirmDelete": "¿Está seguro de que desea eliminar esta reseña?"
+  },
+  "media": {
+    "name": "Nombre",
+    "storageKey": "Clave de almacenamiento",
+    "mimeType": "Tipo",
+    "sizeBytes": "Tamaño",
+    "confirmDelete": "¿Está seguro de que desea eliminar este item?",
+    "upload": "Subir archivo"
+  },
+  "settings": {
+    "siteSettings": "Nombre del sitio, logo y SEO.",
+    "siteName": "Nombre del sitio",
+    "logoUrl": "URL del logo",
+    "metaTitle": "Meta título por defecto",
+    "metaDescription": "Meta descripción por defecto"
+  },
+  "pages": {
+    "title": "Páginas estáticas",
+    "addPage": "Añadir página",
+    "editPage": "Editar página",
+    "confirmDelete": "¿Está seguro de que desea eliminar esta página?"
+  },
+  "tenantUsers": {
+    "title": "Miembros del equipo",
+    "email": "Correo",
+    "role": "Rol",
+    "invite": "Invitar",
+    "confirmRemove": "¿Eliminar este miembro?"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "auth": {
+    "invalid_credentials": "Correo electrónico o contraseña no válidos",
+    "invalid_refresh_token": "Token de actualización no válido o expirado"
+  },
+  "deps": {
+    "missing_authorization": "Cabecera Authorization ausente o no válida",
+    "invalid_token": "Token no válido o expirado",
+    "invalid_token_payload": "Contenido del token no válido"
+  },
+  "integration": {
+    "missing_api_key": "Falta la cabecera X-Api-Key o X-Api-Secret",
+    "invalid_api_key": "Clave de API no válida",
+    "invalid_api_secret": "Secreto de API no válido",
+    "workspace_not_found": "Workspace no encontrado"
+  },
+  "module_guard": {
+    "tenant_required": "Se requiere contexto de tenant",
+    "module_not_enabled": "Este módulo no está habilitado en tu plan"
+  },
+  "catalog_admin": {
+    "forbidden": "Se requiere acceso de administrador del catálogo"
+  }
+}

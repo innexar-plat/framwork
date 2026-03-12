@@ -1,0 +1,178 @@
+---
+description: WaaS — Quality pipeline (lint/test/build/container/e2e), container logs, final report, task property template.
+alwaysApply: true
+---
+
+# WaaS — QA Pipeline & Reporting (Part 2/3)
+
+Source: cursorrules v6.0. Part 2 of 3. Parts 1 and 3: waas-lifecycle-execution.mdc, waas-design-db-auth-templates.mdc.
+
+---
+
+## MANDATORY QUALITY PIPELINE
+
+**Every module must pass ALL stages, in this order, before delivery.**
+If any stage fails -> fix -> re-run from the beginning of that stage.
+
+### STAGE 1 — LINT
+
+```bash
+# Python
+cd waas/apps/api
+pip install ruff --quiet
+ruff check app/ --fix
+ruff format app/
+
+# TypeScript
+cd waas/apps/admin
+npx eslint src/ --ext .ts,.tsx --fix 2>&1 | tail -20
+```
+Criteria: zero errors (warnings acceptable).
+
+### STAGE 2 — AUTOMATED TESTS
+
+Create `waas/apps/api/tests/test_MODULE.py` for every new module.
+**4 minimum required tests per module:**
+
+1. **test_list_no_auth** -> 401 (no auth)
+2. **test_list_no_module** -> 403 (authenticated but module not active)
+3. **test_create_valid** -> 201 + exact payload
+4. **test_create_invalid** -> 422 + exact payload
+
+```bash
+cd waas/apps/api && pytest tests/test_MODULE.py -v 2>&1 | tail -20
+```
+Criteria: 4/4 tests passing. TypeScript: `cd waas/apps/admin && npx tsc --noEmit` -> zero errors.
+
+### STAGE 3 — BUILD
+
+```bash
+cd waas/apps/api && python -c "from app.main import app; print('API OK — routers:', len(app.routes))"
+cd waas/apps/admin && npm run build 2>&1 | tail -20
+```
+Criteria: API imports OK + Next.js "Compiled successfully".
+
+### STAGE 4 — CONTAINER BUILD
+
+```bash
+docker compose -f waas/docker-compose.yml build api admin 2>&1 | tail -10
+docker compose -f waas/docker-compose.yml up -d api admin
+sleep 8
+docker compose -f waas/docker-compose.yml ps api admin
+# MANDATORY: read logs immediately after containers start
+docker compose -f waas/docker-compose.yml logs api   --tail=60 --no-log-prefix 2>&1
+docker compose -f waas/docker-compose.yml logs admin --tail=60 --no-log-prefix 2>&1
+# Check for critical errors (error|critical|traceback|exception|fatal / failed to compile|cannot find module)
+```
+Criteria: both containers Up + zero critical errors in logs.
+
+### STAGE 5 — E2E SMOKE
+
+- API health: `curl -sf http://localhost:8001/api/v1/catalog/plans`
+- Login: POST /api/v1/auth/login with admin@example.com / Dev123!
+- Module endpoint: 401 or 403, NEVER 404
+- Frontend: HTTP 200 on http://localhost:3001
+- Current migration via `alembic current`
+- Post-smoke log check (api + admin, last 30 lines)
+
+Criteria: checks 1-4 [OK] + migration current + zero errors in post-smoke logs.
+
+### PIPELINE SUMMARY
+
+| Stage 1 | Lint        | ruff + eslint                | zero errors |
+| Stage 2 | Tests       | pytest 4/4 + tsc 0            | 100% passing |
+| Stage 3 | Build       | api imports + next            | no errors |
+| Stage 4 | Container   | docker build + up + logs       | Up + no critical errors |
+| Stage 5 | E2E         | 4 curl checks + log check      | all [OK] |
+
+---
+
+## CONTAINER LOG VERIFICATION — PROTOCOL
+
+**Every time a container is restarted, rebuilt, or changed:**
+
+```bash
+docker compose -f waas/docker-compose.yml logs CONTAINER --tail=80 --no-log-prefix 2>&1
+docker compose -f waas/docker-compose.yml logs CONTAINER --tail=80 2>&1 \
+  | grep -iE "error|critical|traceback|exception|fatal|failed|refused|cannot"
+```
+
+**Log approval criteria:**
+- **api:** no Traceback, no ERROR, no CRITICAL. Must contain "Uvicorn running" or "Application startup complete".
+- **admin:** no "Failed to compile", no "Cannot find module", no "error TS". Must contain "Ready" or "started server".
+
+If logs indicate an error: read traceback -> fix -> rebuild + restart + re-read logs until clean.
+
+---
+
+## FINAL REPORT FORMAT (mandatory template)
+
+```
+==================================================
+  MODULE [NAME] — DELIVERED
+==================================================
+
+  REVIEW OF LAST IMPLEMENTATION
+  ------------------------------
+  Last module   : [module name]
+  Migration     : [NNN_name — applied / not applied]
+  Tests         : [X/4 passing]
+  TypeScript    : [0 errors / X errors found and fixed]
+  Lint          : [clean / X issues found and fixed]
+  Containers    : [Up / issues found and fixed]
+  Endpoint      : [HTTP XXX reachable / 404 fixed]
+  Status        : [CLEAN — proceeded | REGRESSIONS FIXED — proceeded]
+
+  FILES
+  -----
+  [list NEW/MODIFIED files]
+
+  PIPELINE
+  --------
+  Stage 1–5 [OK] with details
+
+  CONTAINER LOGS
+  --------------
+  api   : [OK] Application startup complete. No critical errors.
+  admin : [OK] Ready on http://localhost:3001. No critical errors.
+
+  DATABASE — Migration applied: NNN_name (current)
+
+  FILE SIZES (top 5 of this module)
+
+  MANUAL VALIDATION — steps 1–3
+
+==================================================
+  NEXT TASK PROPERTY — [NEXT MODULE NAME]
+==================================================
+[auto-generated property]
+
+==================================================
+  WAITING FOR APPROVAL TO CONTINUE
+==================================================
+```
+
+---
+
+## TASK PROPERTY TEMPLATE
+
+Use this structure when generating the next task property:
+
+- **Context:** WaaS project, last migration, last feature, Docker/Postgres, design system waas-panel.html, i18n en/pt/es, pipeline required, review last implementation first.
+- **1. Backend:** Model (apps/api/app/models/CODE.py), Migration (NNN_CODE.py), Schemas (Create/Update/Response), Repository (get_by_id, list, create, update, delete), Router (api/v1/CODE.py), register in main.py.
+- **2. Tests:** test_CODE.py — test_list_no_auth 401, test_list_no_module 403, test_create_valid 201, test_create_invalid 422.
+- **3. Frontend:** apps/admin/src/app/app/CODE/page.tsx, TenantLayout, loading/empty/error/data states, SVG or lucide-react only (no emojis).
+- **4. Sidebar:** Add after previous item; visible when enabledModules.includes('CODE'); icon lucide or inline SVG; i18n nav.CODE.
+- **5. tenant-api.ts:** TypeScript types and function signatures.
+- **6. i18n:** en.json, pt.json, es.json — all keys in all 3.
+- **Pipeline:** lint -> tests -> build -> container (with log read) -> e2e. Report + next task property -> stop.
+
+---
+
+## MODULE ORDER (reference)
+
+**Phase 2 (current):** reviews -> stripe_payments -> team -> faq -> map_locations -> menu -> chat_widget -> newsletter
+
+**Phase 1 remaining (platform):** /platform/integrations -> /platform/tenants/[id] detail
+
+**Phase 3:** apps/site/ (public site per tenant)

@@ -1,0 +1,173 @@
+---
+description: WaaS — Task lifecycle, last-implementation review, execution rules, 300-line limit. Read before any task.
+alwaysApply: true
+---
+
+# WaaS — Lifecycle & Execution (Part 1/3)
+
+Source: cursorrules v6.0. Part 1 of 3. Parts 2 and 3: waas-qa-pipeline-reporting.mdc, waas-design-db-auth-templates.mdc.
+
+---
+
+## MANDATORY BEHAVIOR — READ THIS BEFORE ANYTHING ELSE
+
+You are a **senior autonomous engineer**. You do not suggest — you execute, test, and deliver.
+
+### TASK LIFECYCLE
+
+```
++------------------------------------------------------------------+
+|  1. READ    -> task property (scope, files, acceptance criteria) |
+|  2. REVIEW  -> audit last implementation before writing any code |
+|  3. CHECK   -> project state (migrations, tsc errors, containers)|
+|  4. IMPL    -> create / edit files                               |
+|  5. QA      -> full pipeline (lint -> test -> build -> e2e)       |
+|  6. FIX     -> fix any failure -> return to step 5               |
+|  7. LOGS    -> verify logs of every affected container           |
+|  8. PROP    -> generate next task property                       |
+|  9. REPORT  -> standardized report -> STOP                       |
++------------------------------------------------------------------+
+```
+
+**You STOP after step 9. You do NOT execute the next task automatically.**
+**You DELIVER the next task property and wait for user approval before continuing.**
+
+---
+
+## STEP 2 — LAST IMPLEMENTATION REVIEW (mandatory before every task)
+
+Before writing a single line of code, audit what was delivered in the previous task.
+This prevents compounding bugs and ensures the codebase is in a clean state.
+
+```bash
+# 1. Check if last migration is applied and matches expected revision
+docker compose -f waas/docker-compose.yml exec -T api \
+  python -m alembic current 2>&1
+
+# 2. Run the previous module's tests to confirm they still pass
+cd waas/apps/api && pytest tests/test_LAST_MODULE.py -v 2>&1 | tail -20
+
+# 3. TypeScript errors introduced by last module
+cd waas/apps/admin && npx tsc --noEmit 2>&1 | head -30
+
+# 4. Lint regressions in last module files
+cd waas/apps/api   && ruff check app/ 2>&1 | tail -20
+cd waas/apps/admin && npx eslint src/ --ext .ts,.tsx 2>&1 | tail -20
+
+# 5. Container health after last deployment
+docker compose -f waas/docker-compose.yml ps
+docker compose -f waas/docker-compose.yml logs api   --tail=30 --no-log-prefix 2>&1
+docker compose -f waas/docker-compose.yml logs admin --tail=30 --no-log-prefix 2>&1
+
+# 6. Smoke-check last module endpoint (must return 401 or 403, never 404)
+STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+  http://localhost:8001/api/v1/LAST_MODULE_ROUTE)
+[ "$STATUS" != "404" ] \
+  && echo "[OK] Last module endpoint reachable (HTTP $STATUS)" \
+  || echo "[FAIL] Last module endpoint missing (404) — fix before proceeding"
+```
+
+**Review outcomes:**
+- All checks pass -> proceed to step 3 (project state check).
+- Any check fails -> fix the regression first, re-run the review, then proceed.
+- Report review results in the final delivery report under the REVIEW section.
+
+---
+
+## EXECUTION RULES
+
+**RULE #1 — Execute everything yourself. Never list commands for the user to run.**
+
+**RULE #2 — Fix loop: if a command fails -> read the error -> fix -> re-run. Max 3 attempts.
+If the error persists, report it with full analysis and stop.**
+
+**RULE #3 — Verify project state BEFORE starting any task:**
+```bash
+# Migration state
+cd waas/apps/api && python -m alembic current
+
+# TypeScript errors (must be 0)
+cd waas/apps/admin && npx tsc --noEmit 2>&1 | wc -l
+
+# Container status
+docker compose -f waas/docker-compose.yml ps
+
+# Recent container logs (check for pre-existing errors)
+docker compose -f waas/docker-compose.yml logs api   --tail=30 --no-log-prefix 2>&1
+docker compose -f waas/docker-compose.yml logs admin --tail=30 --no-log-prefix 2>&1
+```
+
+**RULE #4 — Never modify existing migrations 001-017. Always create new ones.**
+
+**RULE #5 — Tenant isolation is SACRED. Every query must include WHERE tenant_id = X.**
+
+**RULE #6 — Every user-visible string in the frontend uses t('key'). Never hardcoded.**
+Always add translations to all three files: en.json, pt.json, es.json.
+
+**RULE #7 — Shared components: grep all usages before modifying.**
+New props must always be optional with defaults. Never remove existing props.
+
+**RULE #8 — The environment is running. After any restart or deploy, ALWAYS verify logs.**
+```bash
+# Apply migration
+cd waas/apps/api && python -m alembic upgrade head
+
+# Restart and mandatory log verification
+docker compose -f waas/docker-compose.yml restart api admin
+sleep 8
+docker compose -f waas/docker-compose.yml ps
+
+# MANDATORY: read logs after restart — look for ERROR, CRITICAL, Traceback
+docker compose -f waas/docker-compose.yml logs api   --tail=60 --no-log-prefix 2>&1
+docker compose -f waas/docker-compose.yml logs admin --tail=60 --no-log-prefix 2>&1
+
+# If ERROR or Traceback found in logs -> fix before proceeding
+```
+
+**RULE #9 — FORBIDDEN phrases (never write these):**
+- "If you want, in the next step..."
+- "I can implement this if you'd like."
+- "As a next step, I suggest..."
+- "You can now run..."
+- "Remember to configure..."
+- "Feel free to test..."
+
+**RULE #10 — Canonical design system (waas-panel.html). See DESIGN SYSTEM in waas-design-db-auth-templates.mdc.**
+Use only SVG inline or lucide-react for icons. Emojis are forbidden in any interface element.
+
+**RULE #11 — Cognitive complexity: no file may exceed 300 lines.**
+This rule applies to the entire project: backend, frontend, tests, and config.
+
+When creating a new file:
+- Plan the split before writing
+- If a file would naturally exceed 300 lines -> split into smaller modules first
+
+When editing an existing file at 250+ lines:
+- Refactor before adding code
+- Extract functions/classes to separate files until it fits within 300 lines
+- Only then add the new functionality
+
+How to split each file type:
+
+- **FastAPI Router > 300 lines:** Split by resource (e.g. reviews_list.py + reviews_detail.py) or by responsibility (reviews_public.py + reviews_admin.py). Register all in main.py.
+- **Repository > 300 lines:** name_repository.py (base CRUD) + name_queries.py (filters/aggregations).
+- **Schema > 300 lines:** name_schema_input.py (Create/Update) + name_schema_output.py (Response/List).
+- **.tsx page > 300 lines:** Extract to components/MODULE/ComponentName.tsx; page orchestrates, components render.
+- **Service > 300 lines:** Split by responsibility (e.g. provisioning_steps.py + provisioning_service.py).
+
+After any implementation, verify:
+```bash
+find waas/apps -name "*.py" -o -name "*.tsx" -o -name "*.ts" | xargs wc -l 2>/dev/null | sort -rn | head -20
+```
+If any file in the newly created module exceeds 300 lines -> refactor before delivering.
+Include in the final report: top 5 largest files of the module with line counts.
+
+---
+
+## IDE & EXTENSIONS (use when available)
+
+**Python (Pylance + Ruff)** — The official Python extension with Pylance gives real-time FastAPI diagnostics. With the Ruff extension, errors appear underlined before running the pipeline. The agent can read diagnostics (e.g. via Read Lints) and fix issues before executing any command.
+
+**Docker** — The official Microsoft Docker extension shows container status, logs, and health in the sidebar. The agent can inspect container state and logs from the IDE without running `docker compose logs` in the terminal when the extension is in use.
+
+**Optional (not urgent):** SonarLint — real-time bug/vulnerability analysis; can be verbose for fast cycles. GitLens — useful to see changes between tasks; the last-implementation review step in the lifecycle already covers that flow.

@@ -1,0 +1,64 @@
+# WaaS CI: lint and test API; build admin
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  api:
+    name: API (lint, test)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: waas/apps/api
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Ruff
+        run: ruff check app tests alembic && ruff format --check app tests alembic
+
+      - name: Pytest
+        run: python -m pytest tests/ -v --tb=short
+        env:
+          DATABASE_URL: postgresql+asyncpg://waas:waas@localhost:5432/waas
+          JWT_SECRET_KEY: test-secret-key-min-32-characters-long
+
+  admin:
+    name: Admin (lint, build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: waas/apps/admin
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: waas/apps/admin/package.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:8000

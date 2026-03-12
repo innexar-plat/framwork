@@ -1,0 +1,47 @@
+"""Property item repository — all queries scoped by tenant_id."""
+
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.models import PropertyItem
+
+
+class PropertyRepository:
+    """Data access for PropertyItem. Always filter by tenant_id."""
+
+    def __init__(self, db: AsyncSession) -> None:
+        self._db = db
+
+    async def get_by_id(self, item_id: str, tenant_id: str) -> PropertyItem | None:
+        result = await self._db.execute(
+            select(PropertyItem).where(
+                PropertyItem.id == item_id,
+                PropertyItem.tenant_id == tenant_id,
+            )
+        )
+        return result.scalars().first()
+
+    async def list_by_tenant(
+        self,
+        tenant_id: str,
+        limit: int = 50,
+        offset: int = 0,
+    ) -> list[PropertyItem]:
+        result = await self._db.execute(
+            select(PropertyItem)
+            .where(PropertyItem.tenant_id == tenant_id)
+            .order_by(PropertyItem.created_at.desc())
+            .limit(limit)
+            .offset(offset)
+        )
+        return list(result.scalars().all())
+
+    async def add(self, item: PropertyItem) -> PropertyItem:
+        self._db.add(item)
+        await self._db.flush()
+        await self._db.refresh(item)
+        return item
+
+    async def delete(self, item: PropertyItem) -> None:
+        await self._db.delete(item)
+        await self._db.flush()

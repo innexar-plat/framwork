@@ -1,0 +1,123 @@
+---
+description: WaaS — Design system, database/migrations, auth, code templates, seed user, learned patterns.
+alwaysApply: true
+---
+
+# WaaS — Design, Database, Auth & Templates (Part 3/3)
+
+Source: cursorrules v6.0. Part 3 of 3. Parts 1 and 2: waas-lifecycle-execution.mdc, waas-qa-pipeline-reporting.mdc.
+
+---
+
+## DESIGN SYSTEM
+
+**Colors (Tailwind: bg-[#hex] or CSS variable):**
+- page bg: #0a0b0f | surface (cards): #111318 | surface2: #181b23 | border: #1e2230 | border2: #252a38
+- accent (blue): #4f6ef7 | green: #10b981 | orange: #f59e0b | red: #ef4444 | cyan: #06b6d4 | purple: #7c3aed
+- text: #e8eaf0 | text2: #8892a4 | text3: #4a5568
+
+**Typography:** Headings -> Syne, sans-serif, weight 700+ | Body -> DM Sans, sans-serif, weight 400-500
+
+**Icons — MANDATORY:** Use lucide-react (preferred) or inline SVG. **Banned:** emojis in any interface element (buttons, sidebar, badges, cards, tables); react-icons without prior approval.
+- Correct: `import { Settings, Users, Star, MapPin } from 'lucide-react'` and `<Settings className="w-4 h-4 text-[#8892a4]" />`
+- Wrong: emojis in the UI
+
+**Components (reuse — do not recreate):** components/ui/modal.tsx (open?: boolean backward-compatible), toggle.tsx, badge.tsx (green/orange/red/blue/gray), confirm-dialog.tsx. Plan chips: starter=cyan, pro=#4f6ef7, enterprise=#7c3aed. Active nav: bg rgba(79,110,247,0.12) + color #4f6ef7 + 3px left border.
+
+---
+
+## DATABASE
+
+**Standards:** IDs and FKs: String(32), uuid.uuid4().hex (no hyphens). Timestamps: DateTime(timezone=True), server_default=func.now(). Never modify migrations 001-017.
+
+**Existing migrations (001-017):** 001-013: users, tenants, user_tenants, plans, niches, modules, plan_niche_modules, blog_posts, site_pages, property_items, leads, schedule_items, media_items, catalog_audit_logs, workspace_externals, integration_apps. 014: tenants ALTER. 015: briefings. 016: tenant_integrations. 017: provisioning_logs.
+
+**Upcoming:** 018 review_items | 019 team_members | 020 faq_categories + faq_items | 021 menu_categories + menu_items | 022 locations | 023 newsletter_subscribers | 024 stripe_products.
+
+---
+
+## AUTH
+
+- **CurrentUserId** — Bearer -> user_id
+- **RequiredTenantId** — Bearer + tenant JWT -> tenant_id
+- **CatalogAdminUserId** — Bearer + global_role super_admin|catalog_admin
+- **require_active_module("code")** — 403 if module inactive for the tenant
+
+Standard API response: `{ "success": bool, "data": any, "error": null | {"code","message"} }`
+
+---
+
+## CODE TEMPLATES
+
+### Repository (Python)
+
+```python
+class NameRepository:
+    def __init__(self, db: AsyncSession): self.db = db
+    async def get_by_id(self, id: str, tenant_id: str):
+        r = await self.db.execute(select(M).where(M.id==id, M.tenant_id==tenant_id))
+        return r.scalar_one_or_none()
+    async def list(self, tenant_id: str, skip=0, limit=50):
+        r = await self.db.execute(
+            select(M).where(M.tenant_id==tenant_id)
+            .order_by(M.created_at.desc()).offset(skip).limit(limit))
+        return r.scalars().all()
+    async def create(self, tenant_id: str, data):
+        obj = M(id=uuid.uuid4().hex, tenant_id=tenant_id, **data.model_dump())
+        self.db.add(obj); await self.db.commit(); await self.db.refresh(obj)
+        return obj
+    async def update(self, obj, data):
+        for k,v in data.model_dump(exclude_unset=True).items(): setattr(obj,k,v)
+        await self.db.commit(); await self.db.refresh(obj); return obj
+    async def delete(self, obj):
+        await self.db.delete(obj); await self.db.commit()
+```
+
+### Frontend API fetch (TypeScript)
+
+```typescript
+async function apiFetch<T>(path: string, opts?: RequestInit): Promise<T> {
+  const token = localStorage.getItem('waas-access-token')
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${path}`, {
+    ...opts,
+    headers: { 'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`, ...opts?.headers }
+  })
+  if (res.status === 401) { await refreshToken(); return apiFetch(path, opts) }
+  const json = await res.json()
+  if (!json.success) throw new Error(json.error?.message ?? 'Error')
+  return json.data as T
+}
+```
+
+### Sidebar icon (correct pattern)
+
+```tsx
+// CORRECT — lucide-react
+import { Star } from 'lucide-react'
+<Star className="w-4 h-4" />
+
+// CORRECT — inline SVG
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+  stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+</svg>
+
+// WRONG — never use emoji as an icon
+```
+
+---
+
+## SEED USER
+
+Email: admin@example.com | Password: Dev123! | Role: super_admin
+
+---
+
+## LEARNED PATTERNS
+
+**Already implemented:** /platform/briefings + /platform/provision/[briefingId], platform sidebar with pending-count badge, api-client.ts Briefing/Provision types, Modal open?: boolean backward-compatible, i18n nav.briefings en/pt/es.
+
+**Mistakes to never repeat:** Ending with "next step" suggestions; hardcoded text without i18n in all 3 files; required prop on shared component; delivery without full pipeline; not confirming container Up; not reading container logs after restart/deploy; emojis in UI or in pipeline reports (use [OK]/[FAIL]); starting a new task without reviewing last implementation.
+
+**What works:** waas-panel.html design system with exact colors; plan chips cyan/blue/purple; pulsing badge for in-progress; pipeline lint->test->build->container->e2e in sequence; immediate log read after every container restart; lucide-react for all interface icons; last-implementation review to catch regressions.

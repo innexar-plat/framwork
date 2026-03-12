@@ -1,0 +1,24 @@
+{
+  "auth": {
+    "invalid_credentials": "E-mail ou senha inválidos",
+    "invalid_refresh_token": "Token de atualização inválido ou expirado"
+  },
+  "deps": {
+    "missing_authorization": "Cabeçalho Authorization ausente ou inválido",
+    "invalid_token": "Token inválido ou expirado",
+    "invalid_token_payload": "Payload do token inválido"
+  },
+  "integration": {
+    "missing_api_key": "Cabeçalho X-Api-Key ou X-Api-Secret ausente",
+    "invalid_api_key": "Chave de API inválida",
+    "invalid_api_secret": "Segredo de API inválido",
+    "workspace_not_found": "Workspace não encontrado"
+  },
+  "module_guard": {
+    "tenant_required": "Contexto de tenant é obrigatório",
+    "module_not_enabled": "Este módulo não está ativo no seu plano"
+  },
+  "catalog_admin": {
+    "forbidden": "Acesso de administrador do catálogo necessário"
+  }
+}

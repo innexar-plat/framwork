@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WaaS — Painel de Gerenciamento</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0b0f;
+    --surface: #111318;
+    --surface2: #181b23;
+    --border: #1e2230;
+    --border2: #252a38;
+    --accent: #4f6ef7;
+    --accent2: #7c3aed;
+    --green: #10b981;
+    --orange: #f59e0b;
+    --red: #ef4444;
+    --cyan: #06b6d4;
+    --text: #e8eaf0;
+    --text2: #8892a4;
+    --text3: #4a5568;
+    --font-head: 'Syne', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:var(--font-body); min-height:100vh; display:flex; overflow:hidden; }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 240px; min-height:100vh; background:var(--surface);
+    border-right:1px solid var(--border); display:flex; flex-direction:column;
+    padding:0; flex-shrink:0;
+  }
+  .sidebar-logo {
+    padding: 24px 20px 20px;
+    border-bottom:1px solid var(--border);
+  }
+  .logo-mark {
+    display:flex; align-items:center; gap:10px;
+  }
+  .logo-icon {
+    width:34px; height:34px; border-radius:9px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-head); font-weight:800; font-size:15px; color:#fff;
+  }
+  .logo-text { font-family:var(--font-head); font-weight:700; font-size:18px; letter-spacing:-0.3px; }
+  .logo-badge {
+    font-size:10px; color:var(--accent); background:rgba(79,110,247,0.12);
+    padding:2px 6px; border-radius:4px; margin-top:1px; font-weight:500;
+  }
+  .sidebar-section { padding:16px 12px 8px; }
+  .sidebar-label { font-size:10px; font-weight:600; letter-spacing:1.2px; color:var(--text3); text-transform:uppercase; padding:0 8px 8px; }
+  .nav-item {
+    display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:8px;
+    cursor:pointer; transition:all 0.15s; color:var(--text2); font-size:13.5px; font-weight:400;
+    position:relative;
+  }
+  .nav-item:hover { background:var(--surface2); color:var(--text); }
+  .nav-item.active { background:rgba(79,110,247,0.12); color:var(--accent); }
+  .nav-item.active::before {
+    content:''; position:absolute; left:-12px; top:50%; transform:translateY(-50%);
+    width:3px; height:60%; background:var(--accent); border-radius:0 3px 3px 0;
+  }
+  .nav-icon { width:16px; height:16px; opacity:0.85; }
+  .nav-badge {
+    margin-left:auto; background:var(--accent); color:#fff; font-size:10px;
+    padding:2px 6px; border-radius:20px; font-weight:600;
+  }
+  .nav-badge.green { background:var(--green); }
+  .nav-badge.orange { background:var(--orange); color:#000; }
+  .sidebar-bottom {
+    margin-top:auto; border-top:1px solid var(--border); padding:14px 12px;
+  }
+  .user-info { display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:8px; cursor:pointer; }
+  .user-info:hover { background:var(--surface2); }
+  .avatar {
+    width:32px; height:32px; border-radius:8px;
+    background:linear-gradient(135deg,#4f6ef7,#7c3aed);
+    display:flex; align-items:center; justify-content:center;
+    font-size:12px; font-weight:700; color:#fff;
+  }
+  .user-name { font-size:13px; font-weight:500; }
+  .user-role { font-size:11px; color:var(--text3); }
+
+  /* MAIN */
+  .main { flex:1; overflow-y:auto; display:flex; flex-direction:column; }
+  .topbar {
+    padding:16px 28px; display:flex; align-items:center; gap:16px;
+    border-bottom:1px solid var(--border); background:var(--surface);
+    position:sticky; top:0; z-index:10;
+  }
+  .topbar-title { font-family:var(--font-head); font-size:17px; font-weight:700; }
+  .topbar-actions { margin-left:auto; display:flex; gap:10px; }
+  .btn {
+    display:inline-flex; align-items:center; gap:7px; padding:8px 14px;
+    border-radius:8px; font-size:13px; font-weight:500; cursor:pointer;
+    border:none; transition:all 0.15s; font-family:var(--font-body);
+  }
+  .btn-primary { background:var(--accent); color:#fff; }
+  .btn-primary:hover { background:#3d5ce4; }
+  .btn-ghost { background:transparent; color:var(--text2); border:1px solid var(--border2); }
+  .btn-ghost:hover { background:var(--surface2); color:var(--text); }
+  .content { padding:24px 28px; flex:1; }
+
+  /* TABS */
+  .tabs { display:flex; gap:4px; border-bottom:1px solid var(--border); margin-bottom:24px; }
+  .tab {
+    padding:9px 16px; font-size:13.5px; font-weight:500; cursor:pointer;
+    color:var(--text2); border-bottom:2px solid transparent; transition:all 0.15s;
+    margin-bottom:-1px;
+  }
+  .tab:hover { color:var(--text); }
+  .tab.active { color:var(--accent); border-bottom-color:var(--accent); }
+
+  /* CARDS GRID */
+  .cards-row { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
+  .stat-card {
+    background:var(--surface); border:1px solid var(--border); border-radius:12px;
+    padding:18px 20px; position:relative; overflow:hidden; cursor:pointer;
+    transition:border-color 0.2s;
+  }
+  .stat-card:hover { border-color:var(--border2); }
+  .stat-card .glow {
+    position:absolute; top:-20px; right:-20px; width:80px; height:80px;
+    border-radius:50%; opacity:0.07; filter:blur(20px);
+  }
+  .stat-label { font-size:11.5px; color:var(--text2); font-weight:500; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px; }
+  .stat-value { font-family:var(--font-head); font-size:28px; font-weight:800; letter-spacing:-1px; }
+  .stat-delta { font-size:11.5px; margin-top:6px; display:flex; align-items:center; gap:4px; }
+  .delta-up { color:var(--green); }
+  .delta-down { color:var(--red); }
+
+  /* TABLE */
+  .table-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+  .table-header { padding:16px 20px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); }
+  .table-title { font-family:var(--font-head); font-size:14px; font-weight:700; }
+  .search-box {
+    display:flex; align-items:center; gap:8px;
+    background:var(--surface2); border:1px solid var(--border2); border-radius:8px;
+    padding:7px 12px; font-size:13px; color:var(--text2);
+  }
+  .search-box input { background:none; border:none; outline:none; color:var(--text); font-family:var(--font-body); font-size:13px; width:180px; }
+  .search-box input::placeholder { color:var(--text3); }
+  table { width:100%; border-collapse:collapse; }
+  th { font-size:11px; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:0.7px; padding:10px 20px; text-align:left; border-bottom:1px solid var(--border); }
+  td { padding:12px 20px; font-size:13.5px; border-bottom:1px solid var(--border); }
+  tr:last-child td { border-bottom:none; }
+  tr:hover td { background:rgba(255,255,255,0.015); }
+
+  /* BADGES */
+  .badge {
+    display:inline-flex; align-items:center; gap:5px;
+    padding:3px 9px; border-radius:20px; font-size:11px; font-weight:600;
+  }
+  .badge-green { background:rgba(16,185,129,0.12); color:var(--green); }
+  .badge-red { background:rgba(239,68,68,0.12); color:var(--red); }
+  .badge-orange { background:rgba(245,158,11,0.12); color:var(--orange); }
+  .badge-blue { background:rgba(79,110,247,0.12); color:var(--accent); }
+  .badge-gray { background:var(--surface2); color:var(--text2); }
+  .badge-dot { width:5px; height:5px; border-radius:50%; background:currentColor; }
+
+  /* PLAN CHIPS */
+  .plan-chip {
+    display:inline-block; padding:2px 8px; border-radius:5px; font-size:11px; font-weight:600;
+  }
+  .plan-starter { background:rgba(6,182,212,0.1); color:var(--cyan); }
+  .plan-pro { background:rgba(79,110,247,0.1); color:var(--accent); }
+  .plan-enterprise { background:rgba(124,58,237,0.1); color:#a78bfa; }
+
+  /* ACTION BTNS */
+  .action-btn {
+    padding:5px 10px; border-radius:6px; font-size:12px; font-weight:500; cursor:pointer;
+    border:1px solid var(--border2); background:transparent; color:var(--text2);
+    font-family:var(--font-body); transition:all 0.15s;
+  }
+  .action-btn:hover { background:var(--surface2); color:var(--text); }
+  .action-btn.danger { color:var(--red); border-color:rgba(239,68,68,0.3); }
+  .action-btn.danger:hover { background:rgba(239,68,68,0.08); }
+
+  /* RIGHT PANEL */
+  .layout-two { display:grid; grid-template-columns:1fr 320px; gap:16px; }
+
+  /* ACTIVITY */
+  .activity-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px; }
+  .activity-title { font-family:var(--font-head); font-size:14px; font-weight:700; margin-bottom:16px; }
+  .activity-item { display:flex; gap:12px; margin-bottom:14px; }
+  .activity-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; margin-top:5px; }
+  .activity-text { font-size:13px; color:var(--text2); line-height:1.5; }
+  .activity-text strong { color:var(--text); font-weight:500; }
+  .activity-time { font-size:11px; color:var(--text3); margin-top:2px; }
+
+  /* MODAL OVERLAY */
+  .modal-overlay {
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7);
+    z-index:100; align-items:center; justify-content:center; backdrop-filter:blur(4px);
+  }
+  .modal-overlay.open { display:flex; }
+  .modal {
+    background:var(--surface); border:1px solid var(--border2); border-radius:16px;
+    padding:28px; width:480px; max-width:95vw; animation: modalIn 0.2s ease;
+  }
+  @keyframes modalIn { from { opacity:0; transform:translateY(12px) scale(0.97); } to { opacity:1; transform:none; } }
+  .modal-title { font-family:var(--font-head); font-size:18px; font-weight:700; margin-bottom:6px; }
+  .modal-sub { font-size:13px; color:var(--text2); margin-bottom:22px; }
+  .form-group { margin-bottom:16px; }
+  .form-label { font-size:12px; font-weight:600; color:var(--text2); margin-bottom:6px; display:block; text-transform:uppercase; letter-spacing:0.5px; }
+  .form-input {
+    width:100%; background:var(--surface2); border:1px solid var(--border2); border-radius:8px;
+    padding:10px 13px; font-size:13.5px; color:var(--text); font-family:var(--font-body);
+    outline:none; transition:border-color 0.15s;
+  }
+  .form-input:focus { border-color:var(--accent); }
+  .form-select { appearance:none; cursor:pointer; }
+  .form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .modal-footer { display:flex; justify-content:flex-end; gap:10px; margin-top:22px; }
+
+  /* API SECTION */
+  .api-code {
+    background:var(--bg); border:1px solid var(--border); border-radius:8px;
+    padding:14px 16px; font-family:monospace; font-size:12.5px; color:#7ee7b0;
+    margin-bottom:12px; position:relative; overflow:hidden;
+  }
+  .api-code .method { color:#f5a623; font-weight:700; }
+  .api-code .url { color:#84d7fa; }
+  .api-code .key { color:#e2a7ff; }
+  .api-code .val { color:#7ee7b0; }
+  .copy-btn {
+    position:absolute; top:8px; right:8px; padding:3px 9px; font-size:11px;
+    background:var(--surface2); border:1px solid var(--border2); border-radius:5px;
+    color:var(--text2); cursor:pointer; font-family:var(--font-body);
+  }
+  .copy-btn:hover { color:var(--text); }
+
+  /* PAGES */
+  .page { display:none; }
+  .page.active { display:block; }
+
+  /* QUICK ACTIONS */
+  .quick-actions { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:24px; }
+  .quick-card {
+    background:var(--surface); border:1px solid var(--border); border-radius:12px;
+    padding:18px; cursor:pointer; transition:all 0.2s; display:flex; flex-direction:column; gap:10px;
+  }
+  .quick-card:hover { border-color:var(--accent); background:rgba(79,110,247,0.04); transform:translateY(-1px); }
+  .quick-icon { width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:18px; }
+  .quick-name { font-family:var(--font-head); font-size:14px; font-weight:700; }
+  .quick-desc { font-size:12px; color:var(--text2); }
+
+  /* PROGRESS BAR */
+  .progress-bar { height:4px; background:var(--border); border-radius:2px; margin-top:6px; }
+  .progress-fill { height:100%; border-radius:2px; background:linear-gradient(90deg,var(--accent),var(--accent2)); transition:width 0.5s; }
+
+  /* NOTIFICATION DOT */
+  .notif-dot {
+    width:7px; height:7px; background:var(--red); border-radius:50%;
+    position:absolute; top:6px; right:6px;
+  }
+
+  /* TOGGLE */
+  .toggle { position:relative; display:inline-block; width:36px; height:20px; }
+  .toggle input { opacity:0; width:0; height:0; }
+  .toggle-slider {
+    position:absolute; cursor:pointer; inset:0;
+    background:var(--border2); border-radius:20px; transition:0.2s;
+  }
+  .toggle-slider::before {
+    content:''; position:absolute; height:14px; width:14px;
+    left:3px; bottom:3px; background:#fff; border-radius:50%; transition:0.2s;
+  }
+  .toggle input:checked + .toggle-slider { background:var(--accent); }
+  .toggle input:checked + .toggle-slider::before { transform:translateX(16px); }
+
+  /* PLAN MATRIX */
+  .matrix-table th, .matrix-table td { padding:10px 14px; font-size:12.5px; }
+  .matrix-check { color:var(--green); font-size:16px; }
+  .matrix-x { color:var(--text3); font-size:14px; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width:5px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:var(--border2); border-radius:3px; }
+
+  /* NICHE TAGS */
+  .niche-tag { display:inline-block; padding:3px 10px; border-radius:5px; font-size:11px; font-weight:500; background:var(--surface2); color:var(--text2); margin-right:4px; }
+
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .live-dot { display:inline-block; width:6px; height:6px; background:var(--green); border-radius:50%; margin-right:5px; animation:pulse 2s infinite; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">
+      <div class="logo-icon">W</div>
+      <div>
+        <div class="logo-text">WaaS</div>
+        <div class="logo-badge">PLATFORM</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Plataforma</div>
+    <div class="nav-item active" onclick="showPage('dashboard')">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item" onclick="showPage('tenants')">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+      Sites & Tenants
+      <span class="nav-badge green">42</span>
+    </div>
+    <div class="nav-item" onclick="showPage('api')">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      API & Integrações
+    </div>
+    <div class="nav-item" onclick="showPage('audit')">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+      Auditoria
+      <span class="nav-badge orange">3</span>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Catálogo</div>
+    <div class="nav-item" onclick="showPage('plans')">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+      Planos
+    </div>
+    <div class="nav-item" onclick="showPage('niches')">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
+      Nichos
+    </div>
+    <div class="nav-item" onclick="showPage('modules')">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+      Módulos & Matriz
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Sistema</div>
+    <div class="nav-item" onclick="showPage('billing')">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      Faturamento
+    </div>
+    <div class="nav-item">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>
+      Configurações
+    </div>
+  </div>
+
+  <div class="sidebar-bottom">
+    <div class="user-info">
+      <div class="avatar">SA</div>
+      <div>
+        <div class="user-name">Super Admin</div>
+        <div class="user-role"><span class="live-dot"></span>Online</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+
+  <!-- DASHBOARD PAGE -->
+  <div class="page active" id="page-dashboard">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">Dashboard da Plataforma</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-ghost" onclick="showPage('api')">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M8 9l3 3-3 3m5 0h3"/></svg>
+          Ver API Docs
+        </button>
+        <button class="btn btn-primary" onclick="openModal('modal-new-tenant')">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Novo Tenant
+        </button>
+      </div>
+    </div>
+    <div class="content">
+      <div class="cards-row">
+        <div class="stat-card" onclick="showPage('tenants')">
+          <div class="glow" style="background:var(--accent)"></div>
+          <div class="stat-label">Total de Sites</div>
+          <div class="stat-value" style="color:var(--accent)">42</div>
+          <div class="stat-delta delta-up">↑ +8 este mês</div>
+          <div class="progress-bar"><div class="progress-fill" style="width:70%"></div></div>
+        </div>
+        <div class="stat-card">
+          <div class="glow" style="background:var(--green)"></div>
+          <div class="stat-label">Sites Ativos</div>
+          <div class="stat-value" style="color:var(--green)">38</div>
+          <div class="stat-delta delta-up">90.4% uptime</div>
+          <div class="progress-bar"><div class="progress-fill" style="width:90%; background:linear-gradient(90deg,var(--green),#34d399)"></div></div>
+        </div>
+        <div class="stat-card">
+          <div class="glow" style="background:var(--orange)"></div>
+          <div class="stat-label">MRR</div>
+          <div class="stat-value" style="color:var(--orange)">R$8.4k</div>
+          <div class="stat-delta delta-up">↑ +R$1.2k vs mês ant.</div>
+          <div class="progress-bar"><div class="progress-fill" style="width:56%; background:linear-gradient(90deg,var(--orange),#fbbf24)"></div></div>
+        </div>
+        <div class="stat-card">
+          <div class="glow" style="background:var(--cyan)"></div>
+          <div class="stat-label">Leads Gerados</div>
+          <div class="stat-value" style="color:var(--cyan)">1.2k</div>
+          <div class="stat-delta delta-up">↑ +340 este mês</div>
+          <div class="progress-bar"><div class="progress-fill" style="width:45%; background:linear-gradient(90deg,var(--cyan),#22d3ee)"></div></div>
+        </div>
+      </div>
+
+      <div class="quick-actions">
+        <div class="quick-card" onclick="openModal('modal-new-tenant')">
+          <div class="quick-icon" style="background:rgba(79,110,247,0.1)">🚀</div>
+          <div class="quick-name">Criar Tenant</div>
+          <div class="quick-desc">Provisionar novo site via painel ou API</div>
+        </div>
+        <div class="quick-card" onclick="showPage('api')">
+          <div class="quick-icon" style="background:rgba(16,185,129,0.1)">⚡</div>
+          <div class="quick-name">API de Integração</div>
+          <div class="quick-desc">Criar/ativar tenants programaticamente</div>
+        </div>
+        <div class="quick-card" onclick="showPage('modules')">
+          <div class="quick-icon" style="background:rgba(124,58,237,0.1)">🧩</div>
+          <div class="quick-name">Gerenciar Módulos</div>
+          <div class="quick-desc">Configurar matriz plano × nicho × módulo</div>
+        </div>
+      </div>
+
+      <div class="layout-two">
+        <div class="table-card">
+          <div class="table-header">
+            <div class="table-title">Últimos Sites Criados</div>
+            <button class="btn btn-ghost" style="font-size:12px; padding:6px 12px" onclick="showPage('tenants')">Ver todos →</button>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Site</th>
+                <th>Plano</th>
+                <th>Nicho</th>
+                <th>Status</th>
+                <th>Criado em</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><div style="font-weight:500">Garcia Imóveis</div><div style="font-size:11px;color:var(--text3)">garcia-imoveis</div></td>
+                <td><span class="plan-chip plan-pro">Pro</span></td>
+                <td><span class="niche-tag">🏠 Imobiliária</span></td>
+                <td><span class="badge badge-green"><span class="badge-dot"></span> Ativo</span></td>
+                <td style="color:var(--text2); font-size:12.5px">Hoje, 14:32</td>
+              </tr>
+              <tr>
+                <td><div style="font-weight:500">Clínica Vitae</div><div style="font-size:11px;color:var(--text3)">clinica-vitae</div></td>
+                <td><span class="plan-chip plan-starter">Starter</span></td>
+                <td><span class="niche-tag">🏥 Saúde</span></td>
+                <td><span class="badge badge-green"><span class="badge-dot"></span> Ativo</span></td>
+                <td style="color:var(--text2); font-size:12.5px">Ontem, 09:15</td>
+              </tr>
+              <tr>
+                <td><div style="font-weight:500">Restaurante Buono</div><div style="font-size:11px;color:var(--text3)">buono-ristorante</div></td>
+                <td><span class="plan-chip plan-pro">Pro</span></td>
+                <td><span class="niche-tag">🍕 Gastronomia</span></td>
+                <td><span class="badge badge-orange"><span class="badge-dot"></span> Trial</span></td>
+                <td style="color:var(--text2); font-size:12.5px">2 dias atrás</td>
+              </tr>
+              <tr>
+                <td><div style="font-weight:500">Advocacia Fonseca</div><div style="font-size:11px;color:var(--text3)">fonseca-advocacia</div></td>
+                <td><span class="plan-chip plan-enterprise">Enterprise</span></td>
+                <td><span class="niche-tag">⚖️ Jurídico</span></td>
+                <td><span class="badge badge-green"><span class="badge-dot"></span> Ativo</span></td>
+                <td style="color:var(--text2); font-size:12.5px">3 dias atrás</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="activity-card">
+          <div class="activity-title">Atividade Recente</div>
+          <div class="activity-item">
+            <div class="activity-dot" style="background:var(--green)"></div>
+            <div>
+              <div class="activity-text"><strong>garcia-imoveis</strong> criado via API</div>
+              <div class="activity-time">Hoje, 14:32</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot" style="background:var(--accent)"></div>
+            <div>
+              <div class="activity-text">Plano <strong>Pro</strong> atualizado (limite leads: 500→1000)</div>
+              <div class="activity-time">Hoje, 11:04</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot" style="background:var(--orange)"></div>
+            <div>
+              <div class="activity-text"><strong>skincare-maya</strong> entrou em trial</div>
+              <div class="activity-time">Ontem, 18:42</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot" style="background:var(--red)"></div>
+            <div>
+              <div class="activity-text"><strong>loja-express</strong> suspensa (pagamento)</div>
+              <div class="activity-time">Ontem, 08:20</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot" style="background:var(--cyan)"></div>
+            <div>
+              <div class="activity-text">Módulo <strong>schedule</strong> ativado para nicho Saúde</div>
+              <div class="activity-time">2 dias atrás</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-dot" style="background:var(--green)"></div>
+            <div>
+              <div class="activity-text"><strong>fonseca-advocacia</strong> reativado</div>
+              <div class="activity-time">3 dias atrás</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TENANTS PAGE -->
+  <div class="page" id="page-tenants">
+    <div class="topbar">
+      <div class="topbar-title">Sites & Tenants</div>
+      <div class="topbar-actions">
+        <div class="search-box">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" placeholder="Buscar por nome ou slug..." oninput="filterTenants(this.value)">
+        </div>
+        <button class="btn btn-primary" onclick="openModal('modal-new-tenant')">+ Novo Tenant</button>
+      </div>
+    </div>
+    <div class="content">
+      <div class="tabs">
+        <div class="tab active" onclick="filterStatus('all',this)">Todos <span style="color:var(--text3);margin-left:4px">42</span></div>
+        <div class="tab" onclick="filterStatus('active',this)">Ativos <span style="color:var(--text3);margin-left:4px">38</span></div>
+        <div class="tab" onclick="filterStatus('trial',this)">Trial <span style="color:var(--text3);margin-left:4px">3</span></div>
+        <div class="tab" onclick="filterStatus('suspended',this)">Suspensos <span style="color:var(--text3);margin-left:4px">1</span></div>
+      </div>
+      <div class="table-card">
+        <table id="tenants-table">
+          <thead>
+            <tr>
+              <th>Site</th>
+              <th>Plano</th>
+              <th>Nicho</th>
+              <th>Módulos Ativos</th>
+              <th>Status</th>
+              <th>Leads</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tenants-tbody">
+            <tr data-status="active">
+              <td><div style="font-weight:500">Garcia Imóveis</div><div style="font-size:11px;color:var(--text3)">garcia-imoveis.waas.app</div></td>
+              <td><span class="plan-chip plan-pro">Pro</span></td>
+              <td><span class="niche-tag">🏠 Imobiliária</span></td>
+              <td><span class="badge badge-blue">blog</span> <span class="badge badge-blue">leads</span> <span class="badge badge-blue">property</span></td>
+              <td><span class="badge badge-green"><span class="badge-dot"></span> Ativo</span></td>
+              <td style="font-weight:600; color:var(--cyan)">127</td>
+              <td>
+                <button class="action-btn" onclick="openModal('modal-edit-tenant')">Editar</button>
+                <button class="action-btn danger" onclick="confirmSuspend()">Suspender</button>
+              </td>
+            </tr>
+            <tr data-status="active">
+              <td><div style="font-weight:500">Clínica Vitae</div><div style="font-size:11px;color:var(--text3)">clinica-vitae.waas.app</div></td>
+              <td><span class="plan-chip plan-starter">Starter</span></td>
+              <td><span class="niche-tag">🏥 Saúde</span></td>
+              <td><span class="badge badge-blue">blog</span> <span class="badge badge-blue">schedule</span></td>
+              <td><span class="badge badge-green"><span class="badge-dot"></span> Ativo</span></td>
+              <td style="font-weight:600; color:var(--cyan)">43</td>
+              <td>
+                <button class="action-btn" onclick="openModal('modal-edit-tenant')">Editar</button>
+                <button class="action-btn danger" onclick="confirmSuspend()">Suspender</button>
+              </td>
+            </tr>
+            <tr data-status="trial">
+              <td><div style="font-weight:500">Restaurante Buono</div><div style="font-size:11px;color:var(--text3)">buono-ristorante.waas.app</div></td>
+              <td><span class="plan-chip plan-pro">Pro</span></td>
+              <td><span class="niche-tag">🍕 Gastronomia</span></td>
+              <td><span class="badge badge-blue">blog</span> <span class="badge badge-blue">media</span></td>
+              <td><span class="badge badge-orange"><span class="badge-dot"></span> Trial</span></td>
+              <td style="font-weight:600; color:var(--cyan)">8</td>
+              <td>
+                <button class="action-btn" style="color:var(--green);border-color:rgba(16,185,129,0.3)" onclick="showToast('✅ Tenant ativado com sucesso!')">Ativar</button>
+                <button class="action-btn" onclick="openModal('modal-edit-tenant')">Editar</button>
+              </td>
+            </tr>
+            <tr data-status="active">
+              <td><div style="font-weight:500">Advocacia Fonseca</div><div style="font-size:11px;color:var(--text3)">fonseca-advocacia.waas.app</div></td>
+              <td><span class="plan-chip plan-enterprise">Enterprise</span></td>
+              <td><span class="niche-tag">⚖️ Jurídico</span></td>
+              <td><span class="badge badge-blue">blog</span> <span class="badge badge-blue">leads</span> <span class="badge badge-blue">pages</span> <span class="badge badge-blue">media</span></td>
+              <td><span class="badge badge-green"><span class="badge-dot"></span> Ativo</span></td>
+              <td style="font-weight:600; color:var(--cyan)">256</td>
+              <td>
+                <button class="action-btn" onclick="openModal('modal-edit-tenant')">Editar</button>
+                <button class="action-btn danger" onclick="confirmSuspend()">Suspender</button>
+              </td>
+            </tr>
+            <tr data-status="suspended">
+              <td><div style="font-weight:500">Loja Express</div><div style="font-size:11px;color:var(--text3)">loja-express.waas.app</div></td>
+              <td><span class="plan-chip plan-starter">Starter</span></td>
+              <td><span class="niche-tag">🛒 Varejo</span></td>
+              <td><span class="badge badge-gray" style="opacity:0.5">—</span></td>
+              <td><span class="badge badge-red"><span class="badge-dot"></span> Suspenso</span></td>
+              <td style="color:var(--text3)">—</td>
+              <td>
+                <button class="action-btn" style="color:var(--green);border-color:rgba(16,185,129,0.3)" onclick="showToast('✅ Tenant reativado!')">Reativar</button>
+              </td>
+            </tr>
+            <tr data-status="active">
+              <td><div style="font-weight:500">Studio Beleza Maya</div><div style="font-size:11px;color:var(--text3)">studio-maya.waas.app</div></td>
+              <td><span class="plan-chip plan-pro">Pro</span></td>
+              <td><span class="niche-tag">💅 Beleza</span></td>
+              <td><span class="badge badge-blue">schedule</span> <span class="badge badge-blue">leads</span> <span class="badge badge-blue">media</span></td>
+              <td><span class="badge badge-green"><span class="badge-dot"></span> Ativo</span></td>
+              <td style="font-weight:600; color:var(--cyan)">89</td>
+              <td>
+                <button class="action-btn" onclick="openModal('modal-edit-tenant')">Editar</button>
+                <button class="action-btn danger" onclick="confirmSuspend()">Suspender</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- API PAGE -->
+  <div class="page" id="page-api">
+    <div class="topbar">
+      <div class="topbar-title">API de Integração</div>
+      <div class="topbar-actions">
+        <button class="btn btn-primary" onclick="showToast('🔑 Nova API Key gerada e copiada!')">Gerar Nova API Key</button>
+      </div>
+    </div>
+    <div class="content">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px">
+        <div>
+          <div class="table-card" style="padding:20px; margin-bottom:16px">
+            <div style="font-family:var(--font-head); font-weight:700; font-size:15px; margin-bottom:4px">Sua API Key</div>
+            <div style="font-size:12.5px; color:var(--text2); margin-bottom:14px">Use no header <code style="background:var(--surface2);padding:2px 5px;border-radius:4px">X-Api-Key</code> em todas as requisições</div>
+            <div style="background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:12px 16px; font-family:monospace; font-size:13px; color:var(--cyan); display:flex; align-items:center; justify-content:space-between;">
+              <span>wk_live_••••••••••••••••••••••••••••Xk9z</span>
+              <button class="action-btn" onclick="showToast('📋 Copiado!')">Copiar</button>
+            </div>
+          </div>
+
+          <div class="table-card" style="padding:20px;">
+            <div style="font-family:var(--font-head); font-weight:700; font-size:15px; margin-bottom:16px">Endpoints</div>
+
+            <div style="font-size:12px; color:var(--text2); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px; font-weight:600">Criar Tenant</div>
+            <div class="api-code">
+              <span class="method">POST</span> <span class="url">/api/v1/integration/workspaces</span>
+              <button class="copy-btn" onclick="showToast('📋 Copiado!')">Copiar</button>
+              <br><br>{<br>
+              &nbsp;&nbsp;<span class="key">"external_id"</span>: <span class="val">"user-123"</span>,<br>
+              &nbsp;&nbsp;<span class="key">"name"</span>: <span class="val">"Garcia Imóveis"</span>,<br>
+              &nbsp;&nbsp;<span class="key">"plan_code"</span>: <span class="val">"pro"</span>,<br>
+              &nbsp;&nbsp;<span class="key">"niche_code"</span>: <span class="val">"imobiliaria"</span><br>
+              }
+            </div>
+
+            <div style="font-size:12px; color:var(--text2); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px; font-weight:600">Suspender</div>
+            <div class="api-code">
+              <span class="method">POST</span> <span class="url">/api/v1/integration/workspaces/{id}/suspend</span>
+              <button class="copy-btn" onclick="showToast('📋 Copiado!')">Copiar</button>
+            </div>
+
+            <div style="font-size:12px; color:var(--text2); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px; font-weight:600">Reativar</div>
+            <div class="api-code">
+              <span class="method">POST</span> <span class="url">/api/v1/integration/workspaces/{id}/reactivate</span>
+              <button class="copy-btn" onclick="showToast('📋 Copiado!')">Copiar</button>
+            </div>
+
+            <div style="font-size:12px; color:var(--text2); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px; font-weight:600">Atualizar Plano</div>
+            <div class="api-code">
+              <span class="method" style="color:#7ee7b0">PATCH</span> <span class="url">/api/v1/integration/workspaces/{external_id}</span>
+              <button class="copy-btn" onclick="showToast('📋 Copiado!')">Copiar</button>
+              <br><br>{ <span class="key">"plan_code"</span>: <span class="val">"enterprise"</span> }
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="table-card" style="padding:20px; margin-bottom:16px">
+            <div style="font-family:var(--font-head); font-weight:700; font-size:15px; margin-bottom:14px">Exemplo: Integração Hotmart</div>
+            <div style="font-size:12.5px; color:var(--text2); margin-bottom:12px">Quando cliente comprar no Hotmart, dispare este webhook para criar o tenant automaticamente:</div>
+            <div class="api-code">
+              <span style="color:var(--text3)">// Hotmart webhook → seu backend → WaaS API</span><br><br>
+              <span class="key">const</span> res = <span class="key">await</span> fetch(<span class="val">"/api/v1/integration/workspaces"</span>, {<br>
+              &nbsp;&nbsp;method: <span class="val">"POST"</span>,<br>
+              &nbsp;&nbsp;headers: {<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<span class="val">"X-Api-Key"</span>: process.env.WAAS_KEY,<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<span class="val">"Content-Type"</span>: <span class="val">"application/json"</span><br>
+              &nbsp;&nbsp;},<br>
+              &nbsp;&nbsp;body: JSON.stringify({<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;external_id: hotmart.buyer.email,<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;name: hotmart.buyer.name,<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;plan_code: <span class="val">"pro"</span>,<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;niche_code: <span class="val">"imobiliaria"</span><br>
+              &nbsp;&nbsp;})<br>
+              });
+            </div>
+          </div>
+
+          <div class="table-card" style="padding:20px">
+            <div style="font-family:var(--font-head); font-weight:700; font-size:15px; margin-bottom:4px">Integrações Sugeridas</div>
+            <div style="font-size:12.5px; color:var(--text2); margin-bottom:14px">Adicione para automatizar o ciclo de vida do tenant</div>
+            <div style="display:flex; flex-direction:column; gap:10px">
+              <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 12px; background:var(--surface2); border-radius:8px; border:1px solid var(--border)">
+                <div style="display:flex; align-items:center; gap:10px">
+                  <span style="font-size:20px">💳</span>
+                  <div><div style="font-size:13px; font-weight:500">Stripe</div><div style="font-size:11.5px; color:var(--text2)">Ativa/suspende por pagamento</div></div>
+                </div>
+                <span class="badge badge-orange">Em breve</span>
+              </div>
+              <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 12px; background:var(--surface2); border-radius:8px; border:1px solid var(--border)">
+                <div style="display:flex; align-items:center; gap:10px">
+                  <span style="font-size:20px">🔥</span>
+                  <div><div style="font-size:13px; font-weight:500">Hotmart</div><div style="font-size:11.5px; color:var(--text2)">Webhook de compra → criar tenant</div></div>
+                </div>
+                <button class="action-btn" style="color:var(--green); border-color:rgba(16,185,129,0.3)" onclick="showToast('✅ Webhook configurado!')">Configurar</button>
+              </div>
+              <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 12px; background:var(--surface2); border-radius:8px; border:1px solid var(--border)">
+                <div style="display:flex; align-items:center; gap:10px">
+                  <span style="font-size:20px">📧</span>
+                  <div><div style="font-size:13px; font-weight:500">SMTP / SendGrid</div><div style="font-size:11.5px; color:var(--text2)">Email de boas-vindas ao tenant</div></div>
+                </div>
+                <span class="badge badge-orange">Em breve</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLANS PAGE -->
+  <div class="page" id="page-plans">
+    <div class="topbar">
+      <div class="topbar-title">Planos</div>
+      <div class="topbar-actions">
+        <button class="btn btn-primary" onclick="openModal('modal-new-plan')">+ Novo Plano</button>
+      </div>
+    </div>
+    <div class="content">
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:24px">
+        <div class="table-card" style="padding:22px; border-color:rgba(6,182,212,0.3)">
+          <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:14px">
+            <div><div class="plan-chip plan-starter" style="font-size:13px; padding:4px 12px;">Starter</div></div>
+            <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+          </div>
+          <div style="font-family:var(--font-head); font-size:24px; font-weight:800; margin-bottom:4px">R$ 97<span style="font-size:13px; font-weight:400; color:var(--text2)">/mês</span></div>
+          <div style="font-size:12px; color:var(--text2); margin-bottom:16px">Para negócios iniciando</div>
+          <div style="font-size:12.5px; color:var(--text2); display:flex; flex-direction:column; gap:6px; margin-bottom:16px">
+            <div>✓ Blog (50 posts)</div><div>✓ Leads (200/mês)</div><div>✓ 2 usuários</div><div>✗ Domínio próprio</div>
+          </div>
+          <div style="display:flex; gap:8px">
+            <button class="action-btn" style="flex:1" onclick="showToast('✏️ Editando plano Starter...')">Editar</button>
+          </div>
+          <div style="font-size:11px; color:var(--text3); margin-top:10px; text-align:center">18 tenants ativos</div>
+        </div>
+        <div class="table-card" style="padding:22px; border-color:rgba(79,110,247,0.4)">
+          <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:14px">
+            <div><div class="plan-chip plan-pro" style="font-size:13px; padding:4px 12px;">Pro</div></div>
+            <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+          </div>
+          <div style="font-family:var(--font-head); font-size:24px; font-weight:800; margin-bottom:4px">R$ 197<span style="font-size:13px; font-weight:400; color:var(--text2)">/mês</span></div>
+          <div style="font-size:12px; color:var(--text2); margin-bottom:16px">Para negócios crescendo</div>
+          <div style="font-size:12.5px; color:var(--text2); display:flex; flex-direction:column; gap:6px; margin-bottom:16px">
+            <div>✓ Blog (ilimitado)</div><div>✓ Leads (1000/mês)</div><div>✓ 5 usuários</div><div>✓ Domínio próprio</div>
+          </div>
+          <div style="display:flex; gap:8px">
+            <button class="action-btn" style="flex:1" onclick="showToast('✏️ Editando plano Pro...')">Editar</button>
+          </div>
+          <div style="font-size:11px; color:var(--text3); margin-top:10px; text-align:center">21 tenants ativos</div>
+        </div>
+        <div class="table-card" style="padding:22px; border-color:rgba(124,58,237,0.3)">
+          <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:14px">
+            <div><div class="plan-chip plan-enterprise" style="font-size:13px; padding:4px 12px;">Enterprise</div></div>
+            <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+          </div>
+          <div style="font-family:var(--font-head); font-size:24px; font-weight:800; margin-bottom:4px">R$ 497<span style="font-size:13px; font-weight:400; color:var(--text2)">/mês</span></div>
+          <div style="font-size:12px; color:var(--text2); margin-bottom:16px">Para grandes operações</div>
+          <div style="font-size:12.5px; color:var(--text2); display:flex; flex-direction:column; gap:6px; margin-bottom:16px">
+            <div>✓ Tudo ilimitado</div><div>✓ Usuários ilimitados</div><div>✓ SLA 99.9%</div><div>✓ Suporte dedicado</div>
+          </div>
+          <div style="display:flex; gap:8px">
+            <button class="action-btn" style="flex:1" onclick="showToast('✏️ Editando plano Enterprise...')">Editar</button>
+          </div>
+          <div style="font-size:11px; color:var(--text3); margin-top:10px; text-align:center">3 tenants ativos</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULES PAGE -->
+  <div class="page" id="page-modules">
+    <div class="topbar">
+      <div class="topbar-title">Módulos & Matriz</div>
+    </div>
+    <div class="content">
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('modules',this)">Módulos</div>
+        <div class="tab" onclick="switchTab('matrix',this)">Matriz Plano × Nicho</div>
+      </div>
+
+      <div id="subtab-modules">
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:14px">
+          <div class="table-card" style="padding:18px">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px">
+              <div style="display:flex; align-items:center; gap:8px"><span style="font-size:20px">📝</span><span style="font-family:var(--font-head);font-weight:700">Blog</span></div>
+              <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div style="font-size:12px; color:var(--text2); margin-bottom:10px">Posts com SEO, categorias e slugs automáticos</div>
+            <div style="font-size:11.5px; color:var(--text3)">Código: <code style="color:var(--cyan)">blog</code></div>
+          </div>
+          <div class="table-card" style="padding:18px">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px">
+              <div style="display:flex; align-items:center; gap:8px"><span style="font-size:20px">🏠</span><span style="font-family:var(--font-head);font-weight:700">Imóveis</span></div>
+              <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div style="font-size:12px; color:var(--text2); margin-bottom:10px">Catálogo de propriedades com galeria e filtros</div>
+            <div style="font-size:11.5px; color:var(--text3)">Código: <code style="color:var(--cyan)">property</code></div>
+          </div>
+          <div class="table-card" style="padding:18px">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px">
+              <div style="display:flex; align-items:center; gap:8px"><span style="font-size:20px">📬</span><span style="font-family:var(--font-head);font-weight:700">Leads</span></div>
+              <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div style="font-size:12px; color:var(--text2); margin-bottom:10px">Captura e gestão de leads com formulários</div>
+            <div style="font-size:11.5px; color:var(--text3)">Código: <code style="color:var(--cyan)">leads</code></div>
+          </div>
+          <div class="table-card" style="padding:18px">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px">
+              <div style="display:flex; align-items:center; gap:8px"><span style="font-size:20px">📅</span><span style="font-family:var(--font-head);font-weight:700">Agenda</span></div>
+              <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div style="font-size:12px; color:var(--text2); margin-bottom:10px">Agendamentos com confirmação e notificação</div>
+            <div style="font-size:11.5px; color:var(--text3)">Código: <code style="color:var(--cyan)">schedule</code></div>
+          </div>
+          <div class="table-card" style="padding:18px">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px">
+              <div style="display:flex; align-items:center; gap:8px"><span style="font-size:20px">🖼️</span><span style="font-family:var(--font-head);font-weight:700">Mídia</span></div>
+              <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div style="font-size:12px; color:var(--text2); margin-bottom:10px">Upload e gerenciamento de imagens e arquivos</div>
+            <div style="font-size:11.5px; color:var(--text3)">Código: <code style="color:var(--cyan)">media</code></div>
+          </div>
+          <div class="table-card" style="padding:18px; border-style:dashed; cursor:pointer" onclick="showToast('🧩 Novo módulo em breve!')">
+            <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:80px; color:var(--text3); gap:6px">
+              <span style="font-size:24px">+</span>
+              <span style="font-size:12.5px">Novo Módulo</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="subtab-matrix" style="display:none">
+        <div class="table-card">
+          <div class="table-header">
+            <div class="table-title">Matriz Plano × Nicho × Módulos</div>
+            <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px" onclick="showToast('✅ Matriz salva!')">Salvar alterações</button>
+          </div>
+          <table class="matrix-table">
+            <thead>
+              <tr>
+                <th>Plano</th>
+                <th>Nicho</th>
+                <th>Blog</th>
+                <th>Imóveis</th>
+                <th>Leads</th>
+                <th>Agenda</th>
+                <th>Mídia</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="plan-chip plan-starter">Starter</span></td>
+                <td><span class="niche-tag">🏠 Imobiliária</span></td>
+                <td><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></td>
+                <td><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></td>
+                <td><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label></td>
+                <td><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label></td>
+                <td><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></td>
+              </tr>
+              <tr>
+                <td><span class="plan-chip plan-pro">Pro</span></td>
+                <td><span class="niche-tag">🏠 Imobiliária</span></td>
+                <td><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></td>
+                <td><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></td>
+                <td><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></td>
+                <td><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label></td>
+                <td><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></td>
+              </tr>
+              <tr>
+                <td><span class="plan-chip plan-starter">Starter</span></td>
+                <td><span class="niche-tag">🏥 Saúde</span></td>
+                <td><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></td>
+                <td><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label></td>
+                <td><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label></td>
+                <td><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></td>
+                <td><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label></td>
+              </tr>
+              <tr>
+                <td><span class="plan-chip plan-pro">Pro</span></td>
+                <td><span class="niche-tag">🏥 Saúde</span></td>
+                <td><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></td>
+                <td><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label></td>
+                <td><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></td>
+                <td><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></td>
+                <td><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></td>
+              </tr>
+              <tr>
+                <td><span class="plan-chip plan-enterprise">Enterprise</span></td>
+                <td><span class="niche-tag">Todos</span></td>
+                <td><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></td>
+                <td><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></td>
+                <td><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></td>
+                <td><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></td>
+                <td><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NICHES PAGE -->
+  <div class="page" id="page-niches">
+    <div class="topbar">
+      <div class="topbar-title">Nichos</div>
+      <div class="topbar-actions">
+        <button class="btn btn-primary" onclick="showToast('🎯 Modal de novo nicho!')">+ Novo Nicho</button>
+      </div>
+    </div>
+    <div class="content">
+      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:14px">
+        <div class="table-card" style="padding:18px; cursor:pointer" onclick="showToast('✏️ Editando nicho...')">
+          <div style="font-size:28px; margin-bottom:8px">🏠</div>
+          <div style="font-family:var(--font-head);font-weight:700; margin-bottom:4px">Imobiliária</div>
+          <div style="font-size:12px; color:var(--text2); margin-bottom:10px">Sites para corretores e imobiliárias</div>
+          <div style="font-size:11px; color:var(--text3)">Código: <code style="color:var(--cyan)">imobiliaria</code> · 14 tenants</div>
+        </div>
+        <div class="table-card" style="padding:18px; cursor:pointer">
+          <div style="font-size:28px; margin-bottom:8px">🏥</div>
+          <div style="font-family:var(--font-head);font-weight:700; margin-bottom:4px">Saúde</div>
+          <div style="font-size:12px; color:var(--text2); margin-bottom:10px">Clínicas, consultórios e profissionais</div>
+          <div style="font-size:11px; color:var(--text3)">Código: <code style="color:var(--cyan)">saude</code> · 8 tenants</div>
+        </div>
+        <div class="table-card" style="padding:18px; cursor:pointer">
+          <div style="font-size:28px; margin-bottom:8px">⚖️</div>
+          <div style="font-family:var(--font-head);font-weight:700; margin-bottom:4px">Jurídico</div>
+          <div style="font-size:12px; color:var(--text2); margin-bottom:10px">Advogados e escritórios</div>
+          <div style="font-size:11px; color:var(--text3)">Código: <code style="color:var(--cyan)">juridico</code> · 6 tenants</div>
+        </div>
+        <div class="table-card" style="padding:18px; cursor:pointer">
+          <div style="font-size:28px; margin-bottom:8px">💅</div>
+          <div style="font-family:var(--font-head);font-weight:700; margin-bottom:4px">Beleza</div>
+          <div style="font-size:12px; color:var(--text2); margin-bottom:10px">Salões, studios e estéticas</div>
+          <div style="font-size:11px; color:var(--text3)">Código: <code style="color:var(--cyan)">beleza</code> · 7 tenants</div>
+        </div>
+        <div class="table-card" style="padding:18px; cursor:pointer">
+          <div style="font-size:28px; margin-bottom:8px">🍕</div>
+          <div style="font-family:var(--font-head);font-weight:700; margin-bottom:4px">Gastronomia</div>
+          <div style="font-size:12px; color:var(--text2); margin-bottom:10px">Restaurantes, cafés e delivery</div>
+          <div style="font-size:11px; color:var(--text3)">Código: <code style="color:var(--cyan)">gastronomia</code> · 5 tenants</div>
+        </div>
+        <div class="table-card" style="padding:18px; cursor:pointer">
+          <div style="font-size:28px; margin-bottom:8px">🛒</div>
+          <div style="font-family:var(--font-head);font-weight:700; margin-bottom:4px">Varejo</div>
+          <div style="font-size:12px; color:var(--text2); margin-bottom:10px">Lojas físicas e e-commerce</div>
+          <div style="font-size:11px; color:var(--text3)">Código: <code style="color:var(--cyan)">varejo</code> · 2 tenants</div>
+        </div>
+        <div class="table-card" style="padding:18px; border-style:dashed; cursor:pointer" onclick="showToast('🎯 Novo nicho!')">
+          <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:80px; color:var(--text3); gap:6px">
+            <span style="font-size:24px">+</span>
+            <span style="font-size:12.5px">Novo Nicho</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUDIT PAGE -->
+  <div class="page" id="page-audit">
+    <div class="topbar"><div class="topbar-title">Auditoria</div></div>
+    <div class="content">
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr><th>Ação</th><th>Entidade</th><th>Usuário</th><th>IP</th><th>Data/Hora</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="badge badge-green">CREATE</span></td><td>Tenant: garcia-imoveis</td><td>Super Admin</td><td>179.34.x.x</td><td style="color:var(--text2);font-size:12.5px">Hoje 14:32:18</td></tr>
+            <tr><td><span class="badge badge-blue">UPDATE</span></td><td>Plan: Pro (limite leads)</td><td>Super Admin</td><td>179.34.x.x</td><td style="color:var(--text2);font-size:12.5px">Hoje 11:04:51</td></tr>
+            <tr><td><span class="badge badge-orange">SUSPEND</span></td><td>Tenant: loja-express</td><td>Sistema (webhook)</td><td>—</td><td style="color:var(--text2);font-size:12.5px">Ontem 08:20:03</td></tr>
+            <tr><td><span class="badge badge-green">ACTIVATE</span></td><td>Module: schedule (saúde)</td><td>Super Admin</td><td>179.34.x.x</td><td style="color:var(--text2);font-size:12.5px">2 dias atrás</td></tr>
+            <tr><td><span class="badge badge-green">REACTIVATE</span></td><td>Tenant: fonseca-advocacia</td><td>Stripe Webhook</td><td>—</td><td style="color:var(--text2);font-size:12.5px">3 dias atrás</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- BILLING PAGE -->
+  <div class="page" id="page-billing">
+    <div class="topbar"><div class="topbar-title">Faturamento</div></div>
+    <div class="content">
+      <div class="cards-row">
+        <div class="stat-card"><div class="stat-label">MRR</div><div class="stat-value" style="color:var(--green)">R$8.4k</div><div class="stat-delta delta-up">↑ +16% vs mês ant.</div></div>
+        <div class="stat-card"><div class="stat-label">ARR Projetado</div><div class="stat-value" style="color:var(--accent)">R$100k</div><div class="stat-delta delta-up">↑ em crescimento</div></div>
+        <div class="stat-card"><div class="stat-label">Churn Rate</div><div class="stat-value" style="color:var(--orange)">2.4%</div><div class="stat-delta delta-up">↓ -0.8% vs mês ant.</div></div>
+        <div class="stat-card"><div class="stat-label">LTV Médio</div><div class="stat-value" style="color:var(--cyan)">R$2.1k</div><div class="stat-delta">11 meses avg.</div></div>
+      </div>
+      <div class="table-card" style="padding:32px; text-align:center; color:var(--text2)">
+        <div style="font-size:36px; margin-bottom:12px">💳</div>
+        <div style="font-family:var(--font-head); font-size:18px; font-weight:700; color:var(--text); margin-bottom:6px">Integração Stripe em breve</div>
+        <div style="font-size:13.5px; max-width:400px; margin:0 auto">Cobranças automáticas, gestão de assinaturas e ativação/suspensão automática por status de pagamento.</div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- MODAL: Novo Tenant -->
+<div class="modal-overlay" id="modal-new-tenant" onclick="closeModalOutside(event,'modal-new-tenant')">
+  <div class="modal">
+    <div class="modal-title">Criar Novo Tenant</div>
+    <div class="modal-sub">Provisiona um novo site na plataforma</div>
+    <div class="form-group">
+      <label class="form-label">Nome do Site</label>
+      <input class="form-input" type="text" placeholder="Ex: Garcia Imóveis">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Plano</label>
+        <select class="form-input form-select">
+          <option>Starter — R$97/mês</option>
+          <option>Pro — R$197/mês</option>
+          <option>Enterprise — R$497/mês</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nicho</label>
+        <select class="form-input form-select">
+          <option>🏠 Imobiliária</option>
+          <option>🏥 Saúde</option>
+          <option>⚖️ Jurídico</option>
+          <option>💅 Beleza</option>
+          <option>🍕 Gastronomia</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email do Admin</label>
+      <input class="form-input" type="email" placeholder="cliente@email.com">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Slug (URL)</label>
+      <input class="form-input" type="text" placeholder="garcia-imoveis">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-new-tenant')">Cancelar</button>
+      <button class="btn btn-primary" onclick="closeModal('modal-new-tenant'); showToast('🚀 Tenant criado com sucesso!')">Criar Tenant</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Edit Tenant -->
+<div class="modal-overlay" id="modal-edit-tenant" onclick="closeModalOutside(event,'modal-edit-tenant')">
+  <div class="modal">
+    <div class="modal-title">Editar Tenant</div>
+    <div class="modal-sub">garcia-imoveis.waas.app</div>
+    <div class="form-group">
+      <label class="form-label">Nome do Site</label>
+      <input class="form-input" type="text" value="Garcia Imóveis">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Plano</label>
+        <select class="form-input form-select">
+          <option>Starter</option>
+          <option selected>Pro</option>
+          <option>Enterprise</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-input form-select">
+          <option selected>Ativo</option>
+          <option>Suspenso</option>
+          <option>Trial</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Domínio Personalizado</label>
+      <input class="form-input" type="text" placeholder="www.garciaimoveis.com.br">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-edit-tenant')">Cancelar</button>
+      <button class="btn btn-primary" onclick="closeModal('modal-edit-tenant'); showToast('✅ Tenant atualizado!')">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: New Plan -->
+<div class="modal-overlay" id="modal-new-plan" onclick="closeModalOutside(event,'modal-new-plan')">
+  <div class="modal">
+    <div class="modal-title">Criar Novo Plano</div>
+    <div class="modal-sub">Defina os limites e o preço do plano</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Nome</label>
+        <input class="form-input" type="text" placeholder="Ex: Business">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Código</label>
+        <input class="form-input" type="text" placeholder="business">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Preço Mensal (R$)</label>
+      <input class="form-input" type="number" placeholder="297">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Limite de Posts</label>
+        <input class="form-input" type="number" placeholder="-1 = ilimitado">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Limite de Leads/mês</label>
+        <input class="form-input" type="number" placeholder="500">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-new-plan')">Cancelar</button>
+      <button class="btn btn-primary" onclick="closeModal('modal-new-plan'); showToast('✅ Plano criado!')">Criar Plano</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" style="position:fixed; bottom:24px; right:24px; background:var(--surface2); border:1px solid var(--border2); border-radius:10px; padding:13px 18px; font-size:13.5px; font-weight:500; z-index:999; transform:translateY(80px); opacity:0; transition:all 0.3s ease; box-shadow:0 8px 32px rgba(0,0,0,0.4);"></div>
+
+<script>
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  event && event.currentTarget && event.currentTarget.classList.add('active');
+}
+
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+function closeModalOutside(e, id) {
+  if (e.target.id === id) closeModal(id);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.transform = 'translateY(0)';
+  t.style.opacity = '1';
+  setTimeout(() => { t.style.transform = 'translateY(80px)'; t.style.opacity = '0'; }, 3000);
+}
+
+function filterTenants(q) {
+  document.querySelectorAll('#tenants-tbody tr').forEach(row => {
+    row.style.display = row.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none';
+  });
+}
+
+function filterStatus(status, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('#tenants-tbody tr').forEach(row => {
+    row.style.display = (status === 'all' || row.dataset.status === status) ? '' : 'none';
+  });
+}
+
+function confirmSuspend() {
+  if (confirm('Tem certeza que deseja suspender este tenant? O acesso ao site será bloqueado.')) {
+    showToast('⛔ Tenant suspenso com sucesso.');
+  }
+}
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('subtab-modules').style.display = tab === 'modules' ? '' : 'none';
+  document.getElementById('subtab-matrix').style.display = tab === 'matrix' ? '' : 'none';
+}
+
+// Nav click handler
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', function() {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
