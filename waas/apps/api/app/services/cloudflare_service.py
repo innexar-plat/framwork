@@ -43,7 +43,11 @@ class CloudflareService:
             resp.raise_for_status()
         data = resp.json()
         if not data.get("success") or not data.get("result", {}).get("id"):
-            raise RuntimeError(data.get("errors", [{"message": "Unknown error"}])[0].get("message", "Create DNS record failed"))
+            raise RuntimeError(
+                data.get("errors", [{"message": "Unknown error"}])[0].get(
+                    "message", "Create DNS record failed"
+                )
+            )
         return data["result"]["id"]
 
     async def delete_subdomain(self, record_id: str) -> bool:

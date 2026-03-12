@@ -17,7 +17,7 @@ const TENANT_NAV: { href: string; labelKey: string; module?: string }[] = [
   { href: "/app/integrations", labelKey: "nav.integrations" },
   { href: "/app/settings", labelKey: "nav.settings" },
   { href: "/app/users", labelKey: "nav.users" },
-  { href: "/app/billing", labelKey: "nav.billing" },
+  { href: "/app/billing", labelKey: "nav.billing", module: "stripe_payments" },
 ];
 
 export function TenantSidebar() {

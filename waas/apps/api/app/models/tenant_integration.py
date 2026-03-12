@@ -10,7 +10,11 @@ class TenantIntegration(Base, TimestampMixin):
     """Integration config per tenant. config_encrypted stores secrets (Fernet)."""
 
     __tablename__ = "tenant_integrations"
-    __table_args__ = (UniqueConstraint("tenant_id", "integration_code", name="uq_tenant_integrations_tenant_code"),)
+    __table_args__ = (
+        UniqueConstraint(
+            "tenant_id", "integration_code", name="uq_tenant_integrations_tenant_code"
+        ),
+    )
 
     id: Mapped[str] = mapped_column(
         String(32),

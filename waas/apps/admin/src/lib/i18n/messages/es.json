@@ -44,10 +44,17 @@
     "auditTitle": "Registro de auditoría",
     "settingsTitle": "Configuración de la plataforma",
     "noTenants": "Aún no hay tenants",
+    "noTenantsHint": "Cree un briefing y provisiónelo para añadir un nuevo tenant.",
     "noAudit": "Sin entradas de auditoría",
     "viewList": "Ver lista",
     "viewLog": "Ver log",
-    "recentCount": "Recientes"
+    "recentCount": "Recientes",
+    "newBriefing": "Nuevo briefing"
+  },
+  "briefings": {
+    "noBriefingsFound": "No se encontraron briefings.",
+    "createBriefing": "Crear briefing",
+    "searchPlaceholder": "Buscar por nombre o email..."
   },
   "footer": {
     "rights": "Todos los derechos reservados.",
@@ -179,5 +186,12 @@
     "role": "Rol",
     "invite": "Invitar",
     "confirmRemove": "¿Eliminar este miembro?"
+  },
+  "payments": {
+    "empty": "Aún no hay productos de pago.",
+    "loadError": "Error al cargar productos.",
+    "comingSoon": "Próximamente.",
+    "pricePerMonth": "/ mes",
+    "pricePerYear": "/ año"
   }
 }

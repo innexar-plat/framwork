@@ -13,9 +13,7 @@ class BriefingRepository:
         self._db = db
 
     async def get_by_id(self, briefing_id: str) -> Briefing | None:
-        result = await self._db.execute(
-            select(Briefing).where(Briefing.id == briefing_id)
-        )
+        result = await self._db.execute(select(Briefing).where(Briefing.id == briefing_id))
         return result.scalar_one_or_none()
 
     async def list_all(
@@ -34,17 +32,20 @@ class BriefingRepository:
     async def slug_requested_exists(self, slug: str) -> bool:
         """True if any briefing has this slug_requested (pending/provisioning)."""
         from sqlalchemy import and_, func
+
         normalized = (slug or "").strip().lower()
         if not normalized:
             return True
         result = await self._db.execute(
-            select(Briefing.id).where(
+            select(Briefing.id)
+            .where(
                 and_(
                     Briefing.slug_requested.isnot(None),
                     func.lower(Briefing.slug_requested) == normalized,
                     Briefing.status.in_(["pending", "provisioning"]),
                 )
-            ).limit(1)
+            )
+            .limit(1)
         )
         return result.scalar_one_or_none() is not None
 

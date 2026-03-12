@@ -44,10 +44,17 @@
     "auditTitle": "Audit log",
     "settingsTitle": "Platform settings",
     "noTenants": "No tenants yet",
+    "noTenantsHint": "Create a briefing and provision it to add a new tenant.",
     "noAudit": "No audit entries",
     "viewList": "View list",
     "viewLog": "View log",
-    "recentCount": "Recent"
+    "recentCount": "Recent",
+    "newBriefing": "New briefing"
+  },
+  "briefings": {
+    "noBriefingsFound": "No briefings found.",
+    "createBriefing": "Create briefing",
+    "searchPlaceholder": "Search by name or email..."
   },
   "footer": {
     "rights": "All rights reserved.",
@@ -179,5 +186,12 @@
     "role": "Role",
     "invite": "Invite",
     "confirmRemove": "Remove this member?"
+  },
+  "payments": {
+    "empty": "No payment products yet.",
+    "loadError": "Failed to load products.",
+    "comingSoon": "Coming soon.",
+    "pricePerMonth": "/ month",
+    "pricePerYear": "/ year"
   }
 }

@@ -27,7 +27,7 @@ export default function CatalogAdminPage() {
   if (!token) {
     return (
       <PlatformLayout>
-        <p className="text-gray-500">{t("common.loading")}</p>
+        <p className="text-[#8892a4]">{t("common.loading")}</p>
       </PlatformLayout>
     );
   }
@@ -35,10 +35,10 @@ export default function CatalogAdminPage() {
   return (
     <PlatformLayout>
       <div className="mx-auto max-w-4xl">
-        <h1 className="text-2xl font-semibold text-gray-900">
+        <h1 className="font-bold text-2xl text-[#e8eaf0]">
           {t("catalog.matrix")}
         </h1>
-        <p className="mt-1 text-gray-600">
+        <p className="mt-1 text-[#8892a4]">
           {t("catalog.plans")}, {t("catalog.niches")}, {t("catalog.modules")}
         </p>
         <div className="mt-6 space-y-8">

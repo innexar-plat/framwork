@@ -52,22 +52,24 @@ export default function PlatformAuditPage() {
   return (
     <PlatformLayout>
       <div className="mx-auto max-w-4xl">
-        <h1 className="text-2xl font-semibold text-gray-900">
+        <h1 className="font-bold text-2xl text-[#e8eaf0]">
           {t("platform.auditTitle")}
         </h1>
         {loading ? (
-          <p className="mt-4 text-gray-500">{t("common.loading")}</p>
+          <p className="mt-4 text-[#8892a4]">{t("common.loading")}</p>
         ) : entries.length === 0 ? (
-          <p className="mt-4 text-gray-500">{t("platform.noAudit")}</p>
+          <div className="mt-6 rounded-xl border border-[#1e2230] bg-[#111318] p-8 text-center">
+            <p className="text-[#8892a4]">{t("platform.noAudit")}</p>
+          </div>
         ) : (
-          <ul className="mt-4 space-y-2">
+          <ul className="mt-6 space-y-2">
             {entries.map((e) => (
               <li
                 key={e.id}
-                className="rounded border border-gray-200 bg-white px-4 py-2 text-sm"
+                className="rounded-xl border border-[#1e2230] bg-[#111318] px-4 py-3 text-sm text-[#e8eaf0]"
               >
                 <span className="font-medium">{e.action}</span> — {e.entity_type}{" "}
-                <span className="text-gray-500">{e.created_at}</span>
+                <span className="text-[#8892a4]">{e.created_at}</span>
               </li>
             ))}
           </ul>

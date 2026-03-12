@@ -9,6 +9,7 @@ from app.api.v1.catalog_admin import router as catalog_admin_router
 from app.api.v1.integration import router as integration_router
 from app.api.v1.leads import router as leads_router
 from app.api.v1.media import router as media_router
+from app.api.v1.payments import router as payments_router
 from app.api.v1.platform import router as platform_router
 from app.api.v1.property import router as property_router
 from app.api.v1.public import router as public_router
@@ -34,6 +35,7 @@ api_router.include_router(integration_router, prefix="/integration", tags=["inte
 api_router.include_router(leads_router, prefix="/leads", tags=["leads"])
 api_router.include_router(media_router, prefix="/media", tags=["media"])
 api_router.include_router(property_router, prefix="/property", tags=["property"])
+api_router.include_router(payments_router, prefix="/payments", tags=["payments"])
 api_router.include_router(reviews_router, prefix="/reviews", tags=["reviews"])
 api_router.include_router(schedule_router, prefix="/schedule", tags=["schedule"])
 api_router.include_router(tenant_router, prefix="/tenant", tags=["tenant"])

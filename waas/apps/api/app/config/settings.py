@@ -34,7 +34,7 @@ class Settings(BaseSettings):
     api_secret_header: str = "X-Api-Secret"
 
     # CORS (env CORS_ORIGINS: comma-separated string)
-    cors_origins: str = "http://localhost:3000"
+    cors_origins: str = "http://localhost:3000,http://localhost:3001"
 
     # Media upload (local storage base path)
     media_upload_dir: str = "./uploads"

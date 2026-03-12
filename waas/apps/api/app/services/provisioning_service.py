@@ -3,13 +3,13 @@
 import logging
 import secrets
 import string
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from uuid import uuid4
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.security import hash_password
-from app.models import Briefing, ProvisioningLog, Tenant, User, UserTenant
+from app.models import ProvisioningLog, Tenant, User, UserTenant
 from app.repositories.briefing_repository import BriefingRepository
 from app.repositories.provisioning_log_repository import ProvisioningLogRepository
 from app.repositories.tenant_repository import TenantRepository
@@ -103,7 +103,9 @@ class ProvisioningService:
                 return candidate
         return f"{slug}-{uuid4().hex[:8]}"
 
-    async def provision(self, briefing_id: str, override_slug: str | None = None) -> ProvisioningResult:
+    async def provision(
+        self, briefing_id: str, override_slug: str | None = None
+    ) -> ProvisioningResult:
         """
         Run all 10 steps. On failure, update briefing/tenant status and raise.
         """
@@ -119,7 +121,9 @@ class ProvisioningService:
         tenant: Tenant | None = None
         try:
             # Step 1 — already validated above
-            await self._log(briefing_id, 1, PROVISIONING_STEPS[0][1], "success", "Briefing validated")
+            await self._log(
+                briefing_id, 1, PROVISIONING_STEPS[0][1], "success", "Briefing validated"
+            )
 
             # Step 2
             slug = await self._unique_slug(override_slug or briefing.slug_requested)
@@ -130,7 +134,10 @@ class ProvisioningService:
             niche_id = await self._catalog.get_niche_id_by_code(briefing.niche_code)
             if not plan_id or not niche_id:
                 await self._log(
-                    briefing_id, 3, PROVISIONING_STEPS[2][1], "failed",
+                    briefing_id,
+                    3,
+                    PROVISIONING_STEPS[2][1],
+                    "failed",
                     "Invalid plan_code or niche_code",
                 )
                 raise ValueError("Invalid plan_code or niche_code")
@@ -193,7 +200,9 @@ class ProvisioningService:
                     name=briefing.client_name or briefing.client_email.split("@")[0],
                 )
                 await self._user_repo.add(user)
-            await self._log(briefing_id, 6, PROVISIONING_STEPS[5][1], "success", "Credentials generated")
+            await self._log(
+                briefing_id, 6, PROVISIONING_STEPS[5][1], "success", "Credentials generated"
+            )
             await self._log(briefing_id, 7, PROVISIONING_STEPS[6][1], "success", user.id)
 
             # Step 8
@@ -210,6 +219,7 @@ class ProvisioningService:
 
             # Step 9
             from app.config import get_settings
+
             panel_url = get_settings().panel_base_url
             try:
                 await self._email.send_welcome_tenant(
@@ -228,7 +238,7 @@ class ProvisioningService:
                 # Continue — do not fail provisioning for email failure
 
             # Step 10
-            now = datetime.now(timezone.utc)
+            now = datetime.now(UTC)
             tenant.provisioning_status = "active"
             tenant.provisioned_at = now
             self._db.add(tenant)

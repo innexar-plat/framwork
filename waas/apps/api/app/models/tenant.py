@@ -31,15 +31,15 @@ class Tenant(Base, TimestampMixin):
     meta_title: Mapped[str | None] = mapped_column(String(255), nullable=True)
     meta_description: Mapped[str | None] = mapped_column(String(500), nullable=True)
     # Provisioning
-    subdomain: Mapped[str | None] = mapped_column(String(100), unique=True, nullable=True, index=True)
+    subdomain: Mapped[str | None] = mapped_column(
+        String(100), unique=True, nullable=True, index=True
+    )
     custom_domain: Mapped[str | None] = mapped_column(String(255), nullable=True)
     cf_record_id: Mapped[str | None] = mapped_column(String(50), nullable=True)
     provisioning_status: Mapped[str] = mapped_column(
         String(50), nullable=False, default="pending", server_default="pending"
     )
-    provisioned_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
+    provisioned_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     git_repo_url: Mapped[str | None] = mapped_column(String(255), nullable=True)
     welcome_email_sent: Mapped[bool] = mapped_column(
         Boolean, nullable=False, default=False, server_default="false"

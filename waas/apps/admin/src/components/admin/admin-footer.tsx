@@ -8,10 +8,10 @@ export function AdminFooter() {
 
   return (
     <footer
-      className="shrink-0 border-t border-gray-200 bg-white px-6 py-3"
+      className="shrink-0 border-t border-[#1e2230] bg-[#111318] px-6 py-3"
       role="contentinfo"
     >
-      <div className="flex items-center justify-between text-sm text-gray-500">
+      <div className="flex items-center justify-between text-sm text-[#8892a4]">
         <span>
           © {year} WaaS. {t("footer.rights")}
         </span>

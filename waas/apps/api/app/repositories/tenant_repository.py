@@ -32,12 +32,14 @@ class TenantRepository:
         if not normalized:
             return False
         result = await self._db.execute(
-            select(Tenant.id).where(
+            select(Tenant.id)
+            .where(
                 or_(
                     Tenant.slug == normalized,
                     Tenant.subdomain == normalized,
                 )
-            ).limit(1)
+            )
+            .limit(1)
         )
         return result.scalar_one_or_none() is not None
 

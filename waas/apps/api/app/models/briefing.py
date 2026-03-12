@@ -4,7 +4,7 @@ from datetime import datetime
 
 from sqlalchemy import Boolean, DateTime, String, Text
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base, TimestampMixin, generate_uuid_hex
 
@@ -46,6 +46,4 @@ class Briefing(Base, TimestampMixin):
         String(50), nullable=False, default="pending", server_default="pending"
     )
     tenant_id: Mapped[str | None] = mapped_column(String(32), nullable=True, index=True)
-    provisioned_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
+    provisioned_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

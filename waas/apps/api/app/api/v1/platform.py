@@ -1,5 +1,7 @@
 """Platform admin: tenants, audit, briefings, provision, integrations. Requires catalog_admin where noted."""
 
+import logging
+
 from fastapi import APIRouter, HTTPException, status
 
 from app.config import get_settings
@@ -29,6 +31,7 @@ from app.services.cloudflare_service import CloudflareService
 from app.services.email_service import EmailService
 from app.services.provisioning_service import ProvisioningService
 
+logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
@@ -126,7 +129,9 @@ async def list_briefings(
     return ApiResponse(success=True, data=[_briefing_to_response(b) for b in items], error=None)
 
 
-@router.post("/briefings", response_model=ApiResponse[BriefingResponse], status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/briefings", response_model=ApiResponse[BriefingResponse], status_code=status.HTTP_201_CREATED
+)
 async def create_briefing(
     body: BriefingCreate,
     db: DbSession,
@@ -201,6 +206,12 @@ async def provision_tenant(
         )
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    except Exception as e:
+        logger.exception("Provisioning failed for briefing %s: %s", body.briefing_id, e)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Provisioning failed. Check server logs.",
+        )
 
 
 @router.get("/provision/{briefing_id}/status", response_model=ApiResponse[ProvisionStatusResponse])

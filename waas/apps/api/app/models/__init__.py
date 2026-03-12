@@ -11,11 +11,12 @@ from app.models.module import Module
 from app.models.niche import Niche
 from app.models.plan import Plan
 from app.models.plan_niche_module import PlanNicheModule
-from app.models.provisioning_log import ProvisioningLog
 from app.models.property_item import PropertyItem
+from app.models.provisioning_log import ProvisioningLog
 from app.models.review_item import ReviewItem
 from app.models.schedule_item import ScheduleItem
 from app.models.site_page import SitePage
+from app.models.stripe_product import StripeProduct
 from app.models.tenant import Tenant
 from app.models.tenant_integration import TenantIntegration
 from app.models.user import User
@@ -39,6 +40,7 @@ __all__ = [
     "ReviewItem",
     "ScheduleItem",
     "SitePage",
+    "StripeProduct",
     "Tenant",
     "TenantIntegration",
     "User",

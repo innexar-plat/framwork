@@ -4,6 +4,7 @@ import { PlatformLayout } from "@/components/admin/platform-layout";
 import { useAuth } from "@/lib/auth-context";
 import { useI18n } from "@/lib/i18n";
 import { getPlatformTenants } from "@/lib/api-client";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -52,22 +53,41 @@ export default function PlatformTenantsPage() {
   return (
     <PlatformLayout>
       <div className="mx-auto max-w-4xl">
-        <h1 className="text-2xl font-semibold text-gray-900">
-          {t("platform.tenantsTitle")}
-        </h1>
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <h1 className="font-bold text-2xl text-[#e8eaf0]">
+            {t("platform.tenantsTitle")}
+          </h1>
+          <Link
+            href="/onboarding"
+            className="rounded-lg bg-[#4f6ef7] px-4 py-2 text-sm font-medium text-white hover:bg-[#3d5ce4]"
+          >
+            {t("platform.newBriefing")}
+          </Link>
+        </div>
         {loading ? (
-          <p className="mt-4 text-gray-500">{t("common.loading")}</p>
+          <p className="mt-4 text-[#8892a4]">{t("common.loading")}</p>
         ) : tenants.length === 0 ? (
-          <p className="mt-4 text-gray-500">{t("platform.noTenants")}</p>
+          <div className="mt-6 rounded-xl border border-[#1e2230] bg-[#111318] p-8 text-center">
+            <p className="text-[#8892a4]">{t("platform.noTenants")}</p>
+            <p className="mt-2 text-sm text-[#4a5568]">
+              {t("platform.noTenantsHint")}
+            </p>
+            <Link
+              href="/onboarding"
+              className="mt-4 inline-block rounded-lg bg-[#4f6ef7] px-4 py-2 text-sm font-medium text-white hover:bg-[#3d5ce4]"
+            >
+              {t("platform.newBriefing")}
+            </Link>
+          </div>
         ) : (
-          <ul className="mt-4 space-y-2">
-            {tenants.map((t) => (
+          <ul className="mt-6 space-y-2">
+            {tenants.map((tenant) => (
               <li
-                key={t.id}
-                className="flex items-center justify-between rounded border border-gray-200 bg-white px-4 py-2"
+                key={tenant.id}
+                className="flex items-center justify-between rounded-xl border border-[#1e2230] bg-[#111318] px-4 py-3"
               >
-                <span className="font-medium">{t.name}</span>
-                <span className="text-sm text-gray-500">{t.slug}</span>
+                <span className="font-medium text-[#e8eaf0]">{tenant.name}</span>
+                <span className="text-sm text-[#8892a4]">{tenant.slug}</span>
               </li>
             ))}
           </ul>

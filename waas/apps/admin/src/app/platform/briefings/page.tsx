@@ -163,7 +163,7 @@ export default function PlatformBriefingsPage() {
               </svg>
               <input
                 type="text"
-                placeholder="Search by name or email..."
+                placeholder={t("briefings.searchPlaceholder")}
                 value={search}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
                 className="w-48 bg-transparent text-sm text-[#e8eaf0] outline-none placeholder:text-[#4a5568]"
@@ -196,9 +196,17 @@ export default function PlatformBriefingsPage() {
 
           <div className="overflow-hidden rounded-xl border border-[#1e2230] bg-[#111318]">
             {loading ? (
-              <div className="p-12 text-center text-[#8892a4]">Loading...</div>
+              <div className="p-12 text-center text-[#8892a4]">{t("common.loading")}</div>
             ) : filtered.length === 0 ? (
-              <div className="p-12 text-center text-[#8892a4]">No briefings found.</div>
+              <div className="flex flex-col items-center justify-center gap-4 p-12 text-center">
+                <p className="text-[#8892a4]">{t("briefings.noBriefingsFound")}</p>
+                <Link
+                  href="/onboarding"
+                  className="rounded-lg bg-[#4f6ef7] px-4 py-2 text-sm font-medium text-white hover:bg-[#3d5ce4]"
+                >
+                  {t("briefings.createBriefing")}
+                </Link>
+              </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full border-collapse">

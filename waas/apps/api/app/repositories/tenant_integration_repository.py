@@ -1,6 +1,5 @@
 """TenantIntegration repository — get/list/set by tenant and code."""
 
-import json
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 

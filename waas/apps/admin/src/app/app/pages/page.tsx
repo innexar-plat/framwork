@@ -53,9 +53,9 @@ export default function AppPagesPage() {
   }, [isAuthenticated, hasTenant, router]);
 
   useEffect(() => {
-    if (!token) return;
+    if (!token || !hasTenant) return;
     load();
-  }, [token, load]);
+  }, [token, hasTenant, load]);
 
   const openCreate = () => {
     setEditingPage(null);

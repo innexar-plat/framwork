@@ -56,34 +56,42 @@ export default function PlatformDashboardPage() {
   return (
     <PlatformLayout>
       <div className="mx-auto max-w-5xl">
-        <h1 className="text-2xl font-semibold text-gray-900">
+        <h1 className="font-bold text-2xl text-[#e8eaf0]">
           {t("platform.dashboardTitle")}
         </h1>
         <section className="mt-6 grid gap-4 sm:grid-cols-2">
-          <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-            <h2 className="text-sm font-medium text-gray-900">
+          <div className="rounded-xl border border-[#1e2230] bg-[#111318] p-5">
+            <h2 className="text-sm font-medium text-[#8892a4]">
               {t("platform.tenantsTitle")}
             </h2>
-            <p className="mt-2 text-2xl font-semibold text-gray-700">
+            <p className="mt-2 font-semibold text-2xl text-[#e8eaf0]">
               {tenantCount !== null ? tenantCount : "—"}
             </p>
-            <Link
-              href="/platform/tenants"
-              className="mt-2 inline-block text-sm text-gray-600 hover:text-gray-900"
-            >
-              {t("platform.viewList")} →
-            </Link>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Link
+                href="/platform/tenants"
+                className="text-sm font-medium text-[#4f6ef7] hover:text-[#6b8cff]"
+              >
+                {t("platform.viewList")} →
+              </Link>
+              <Link
+                href="/onboarding"
+                className="rounded-lg bg-[#4f6ef7] px-3 py-1.5 text-sm font-medium text-white hover:bg-[#3d5ce4]"
+              >
+                {t("platform.newBriefing")}
+              </Link>
+            </div>
           </div>
-          <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-            <h2 className="text-sm font-medium text-gray-900">
+          <div className="rounded-xl border border-[#1e2230] bg-[#111318] p-5">
+            <h2 className="text-sm font-medium text-[#8892a4]">
               {t("platform.auditTitle")}
             </h2>
-            <p className="mt-2 text-2xl font-semibold text-gray-700">
+            <p className="mt-2 font-semibold text-2xl text-[#e8eaf0]">
               {t("platform.recentCount")}: {auditCount !== null ? auditCount : "—"}
             </p>
             <Link
               href="/platform/audit"
-              className="mt-2 inline-block text-sm text-gray-600 hover:text-gray-900"
+              className="mt-2 inline-block text-sm font-medium text-[#4f6ef7] hover:text-[#6b8cff]"
             >
               {t("platform.viewLog")} →
             </Link>
@@ -92,7 +100,7 @@ export default function PlatformDashboardPage() {
         <div className="mt-6">
           <Link
             href="/admin/catalog"
-            className="inline-block rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+            className="inline-block rounded-lg border border-[#252a38] bg-[#181b23] px-4 py-2 text-sm font-medium text-[#e8eaf0] hover:bg-[#1e2230]"
           >
             {t("nav.catalog")}
           </Link>

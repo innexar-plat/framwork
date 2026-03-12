@@ -2,6 +2,7 @@
 
 import json
 import logging
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
@@ -10,15 +11,27 @@ from app.repositories.tenant_integration_repository import TenantIntegrationRepo
 
 logger = logging.getLogger(__name__)
 
-VALID_INTEGRATION_CODES = frozenset({
-    "google_oauth", "meta_pixel", "stripe", "google_maps", "whatsapp",
-    "mailchimp", "brevo", "ga4", "google_reviews", "calendly", "tidio",
-})
+VALID_INTEGRATION_CODES = frozenset(
+    {
+        "google_oauth",
+        "meta_pixel",
+        "stripe",
+        "google_maps",
+        "whatsapp",
+        "mailchimp",
+        "brevo",
+        "ga4",
+        "google_reviews",
+        "calendly",
+        "tidio",
+    }
+)
 
 
 def _get_fernet():
     """Return Fernet instance if encryption_key is set."""
     from cryptography.fernet import Fernet
+
     key = get_settings().encryption_key
     if not key:
         return None
@@ -100,6 +113,7 @@ class TenantIntegrationService:
         row = await self._repo.get(tenant_id, integration_code)
         if not row:
             from app.models.base import generate_uuid_hex
+
             row = TenantIntegration(
                 id=generate_uuid_hex(),
                 tenant_id=tenant_id,
@@ -130,10 +144,12 @@ class TenantIntegrationService:
                     config_public = json.loads(row.config_public)
                 except json.JSONDecodeError:
                     pass
-            result.append({
-                "integration_code": row.integration_code,
-                "is_enabled": row.is_enabled,
-                "configured": bool(row.config_encrypted or row.config_public),
-                "config_public": config_public,
-            })
+            result.append(
+                {
+                    "integration_code": row.integration_code,
+                    "is_enabled": row.is_enabled,
+                    "configured": bool(row.config_encrypted or row.config_public),
+                    "config_public": config_public,
+                }
+            )
         return result

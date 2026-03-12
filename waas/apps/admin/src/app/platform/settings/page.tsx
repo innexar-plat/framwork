@@ -24,10 +24,12 @@ export default function PlatformSettingsPage() {
   return (
     <PlatformLayout>
       <div className="mx-auto max-w-4xl">
-        <h1 className="text-2xl font-semibold text-gray-900">
+        <h1 className="font-bold text-2xl text-[#e8eaf0]">
           {t("platform.settingsTitle")}
         </h1>
-        <p className="mt-2 text-gray-500">Em breve.</p>
+        <div className="mt-6 rounded-xl border border-[#1e2230] bg-[#111318] p-8">
+          <p className="text-[#8892a4]">{t("payments.comingSoon")}</p>
+        </div>
       </div>
     </PlatformLayout>
   );

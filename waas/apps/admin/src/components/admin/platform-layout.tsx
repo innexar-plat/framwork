@@ -10,11 +10,14 @@ interface PlatformLayoutProps {
 
 export function PlatformLayout({ children }: PlatformLayoutProps) {
   return (
-    <div className="flex min-h-screen flex-col bg-gray-50 md:flex-row">
+    <div className="flex min-h-screen flex-col bg-[#0a0b0f] md:flex-row">
       <PlatformSidebar />
-      <div className="flex flex-1 flex-col min-w-0">
+      <div className="flex min-w-0 flex-1 flex-col">
         <PlatformHeader />
-        <main className="flex-1 overflow-auto p-6" id="main-content">
+        <main
+          className="flex-1 overflow-auto p-6 text-[#e8eaf0]"
+          id="main-content"
+        >
           {children}
         </main>
         <AdminFooter />

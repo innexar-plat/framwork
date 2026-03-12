@@ -49,7 +49,7 @@ async def list_reviews(
     repo = ReviewRepository(db)
     published_only = published is True
     draft_only = published is False
-    items = await repo.list(
+    items = await repo.list_by_tenant(
         tenant_id,
         published_only=published_only,
         draft_only=draft_only,

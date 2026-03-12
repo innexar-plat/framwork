@@ -21,7 +21,7 @@ class ReviewRepository:
         )
         return result.scalars().first()
 
-    async def list(
+    async def list_by_tenant(
         self,
         tenant_id: str,
         published_only: bool = False,

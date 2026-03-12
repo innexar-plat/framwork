@@ -25,7 +25,9 @@ class ReviewItem(Base, TimestampMixin):
     author_photo: Mapped[str | None] = mapped_column(String(500), nullable=True)
     rating: Mapped[int] = mapped_column(Integer, nullable=False)
     text: Mapped[str] = mapped_column(Text, nullable=False)
-    source: Mapped[str] = mapped_column(String(20), nullable=False, default="manual", server_default="manual")
+    source: Mapped[str] = mapped_column(
+        String(20), nullable=False, default="manual", server_default="manual"
+    )
     google_review_id: Mapped[str | None] = mapped_column(String(200), nullable=True)
     is_published: Mapped[bool] = mapped_column(
         Boolean,

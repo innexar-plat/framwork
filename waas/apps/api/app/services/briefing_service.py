@@ -25,9 +25,7 @@ class BriefingService:
         limit: int = 100,
         offset: int = 0,
     ) -> list[Briefing]:
-        return await self._repo.list_all(
-            status_filter=status_filter, limit=limit, offset=offset
-        )
+        return await self._repo.list_all(status_filter=status_filter, limit=limit, offset=offset)
 
     async def create(self, body: BriefingCreate) -> Briefing:
         briefing = Briefing(

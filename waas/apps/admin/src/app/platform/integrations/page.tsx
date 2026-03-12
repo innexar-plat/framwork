@@ -28,27 +28,27 @@ function SectionCard({
   testing?: boolean;
 }) {
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+    <div className="rounded-xl border border-[#1e2230] bg-[#111318] p-5">
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
+        <h2 className="text-lg font-semibold text-[#e8eaf0]">{title}</h2>
         <span
           className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
             configured
-              ? "bg-green-100 text-green-800"
-              : "bg-amber-100 text-amber-800"
+              ? "bg-[rgba(16,185,129,0.12)] text-[#10b981]"
+              : "bg-[rgba(245,158,11,0.12)] text-[#f59e0b]"
           }`}
         >
           {configured ? "Configured" : "Not configured"}
         </span>
       </div>
-      <div className="space-y-1.5 text-sm text-gray-600">{children}</div>
+      <div className="space-y-1.5 text-sm text-[#8892a4]">{children}</div>
       {onTest && testLabel && (
         <div className="mt-4">
           <button
             type="button"
             onClick={onTest}
             disabled={testing}
-            className="rounded bg-gray-800 px-3 py-1.5 text-sm font-medium text-white hover:bg-gray-900 disabled:opacity-50"
+            className="rounded-lg bg-[#4f6ef7] px-3 py-1.5 text-sm font-medium text-white hover:bg-[#3d5ce4] disabled:opacity-50"
           >
             {testing ? "Testing…" : testLabel}
           </button>
@@ -62,8 +62,8 @@ function FieldRow({ label, value }: { label: string; value: string | null | unde
   if (value == null || value === "") return null;
   return (
     <div className="flex gap-2">
-      <span className="font-medium text-gray-500">{label}:</span>
-      <span className="font-mono text-gray-800">{value}</span>
+      <span className="font-medium text-[#4a5568]">{label}:</span>
+      <span className="font-mono text-[#e8eaf0]">{value}</span>
     </div>
   );
 }
@@ -152,10 +152,10 @@ export default function PlatformIntegrationsPage() {
   return (
     <PlatformLayout>
       <div className="mx-auto max-w-3xl">
-        <h1 className="text-2xl font-semibold text-gray-900">
+        <h1 className="font-bold text-2xl text-[#e8eaf0]">
           {t("nav.platformIntegrations")}
         </h1>
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm text-[#8892a4]">
           Configure via environment variables (.env). Values shown are masked.
         </p>
 
@@ -163,8 +163,8 @@ export default function PlatformIntegrationsPage() {
           <div
             className={`mt-4 rounded-lg border px-4 py-2 text-sm ${
               testMessage.startsWith("Cloudflare:") || testMessage === "Test email sent."
-                ? "border-green-200 bg-green-50 text-green-800"
-                : "border-amber-200 bg-amber-50 text-amber-800"
+                ? "border-[#10b981]/40 bg-[rgba(16,185,129,0.08)] text-[#10b981]"
+                : "border-[#f59e0b]/40 bg-[rgba(245,158,11,0.08)] text-[#f59e0b]"
             }`}
           >
             {testMessage}
@@ -172,7 +172,7 @@ export default function PlatformIntegrationsPage() {
         )}
 
         {loading ? (
-          <p className="mt-6 text-gray-500">{t("common.loading")}</p>
+          <p className="mt-6 text-[#8892a4]">{t("common.loading")}</p>
         ) : status ? (
           <div className="mt-6 space-y-6">
             <SectionCard
@@ -213,7 +213,7 @@ export default function PlatformIntegrationsPage() {
             </SectionCard>
           </div>
         ) : (
-          <p className="mt-6 text-gray-500">Could not load integrations status.</p>
+          <p className="mt-6 text-[#8892a4]">Could not load integrations status.</p>
         )}
       </div>
     </PlatformLayout>

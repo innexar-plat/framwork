@@ -2,7 +2,7 @@
 
 import { useI18n } from "@/lib/i18n";
 import { useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 
 const API_BASE =
   typeof window !== "undefined"
@@ -36,7 +36,7 @@ const NICHE_EMOJI: Record<string, string> = {
   default: "📌",
 };
 
-export default function OnboardingPage() {
+function OnboardingContent() {
   const { t } = useI18n();
   const searchParams = useSearchParams();
   const [step, setStep] = useState(1);
@@ -538,5 +538,19 @@ export default function OnboardingPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function OnboardingPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center bg-[#0a0b0f]">
+          <div className="text-[#8892a4]">Loading…</div>
+        </div>
+      }
+    >
+      <OnboardingContent />
+    </Suspense>
   );
 }
