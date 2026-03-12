@@ -3,11 +3,14 @@
 import { type ReactNode } from "react";
 import { AuthProvider } from "@/lib/auth-context";
 import { I18nProvider } from "@/lib/i18n";
+import { ThemeProvider } from "@/lib/theme-context";
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
-    <I18nProvider>
-      <AuthProvider>{children}</AuthProvider>
-    </I18nProvider>
+    <ThemeProvider>
+      <I18nProvider>
+        <AuthProvider>{children}</AuthProvider>
+      </I18nProvider>
+    </ThemeProvider>
   );
 }

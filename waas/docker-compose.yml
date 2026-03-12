@@ -1,17 +1,33 @@
 # WaaS — API + PostgreSQL + Admin (Next.js)
+# Traefik: waas.innexar.app (admin), api.waas.innexar.app (api) — rede fixelo_fixelo-network
 services:
   api:
     build:
       context: ./apps/api
       dockerfile: Dockerfile
+    env_file:
+      - .env
     ports:
-      - "8001:8000"
+      - "8003:8000"
+    networks:
+      - default
+      - fixelo_fixelo-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.middlewares.waas-api-compress.compress=true"
+      - "traefik.http.routers.waas-api.rule=Host(`api.waas.innexar.app`)"
+      - "traefik.http.routers.waas-api.entrypoints=websecure"
+      - "traefik.http.routers.waas-api.tls.certresolver=cloudflare"
+      - "traefik.http.routers.waas-api.middlewares=waas-api-compress"
+      - "traefik.http.routers.waas-api.service=waas-api-service"
+      - "traefik.http.services.waas-api-service.loadbalancer.server.port=8000"
+      - "traefik.http.services.waas-api-service.loadbalancer.passHostHeader=true"
     environment:
       - DATABASE_URL=postgresql+asyncpg://waas:waas@db:5432/waas
       - JWT_SECRET_KEY=${JWT_SECRET_KEY:-change-me-in-production}
       - DEBUG=${DEBUG:-false}
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
-      - CORS_ORIGINS=http://localhost:3001,http://admin:3000
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3002,http://admin:3000,https://waas.innexar.app}
     depends_on:
       db:
         condition: service_healthy
@@ -27,11 +43,24 @@ services:
       context: ./apps/admin
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_API_URL: http://localhost:8001
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8003}
     ports:
-      - "3001:3000"
+      - "3002:3000"
+    networks:
+      - default
+      - fixelo_fixelo-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.middlewares.waas-admin-compress.compress=true"
+      - "traefik.http.routers.waas-admin.rule=Host(`waas.innexar.app`)"
+      - "traefik.http.routers.waas-admin.entrypoints=websecure"
+      - "traefik.http.routers.waas-admin.tls.certresolver=cloudflare"
+      - "traefik.http.routers.waas-admin.middlewares=waas-admin-compress"
+      - "traefik.http.routers.waas-admin.service=waas-admin-service"
+      - "traefik.http.services.waas-admin-service.loadbalancer.server.port=3000"
+      - "traefik.http.services.waas-admin-service.loadbalancer.passHostHeader=true"
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8001
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8003}
     depends_on:
       - api
     healthcheck:
@@ -48,7 +77,7 @@ services:
       POSTGRES_PASSWORD: waas
       POSTGRES_DB: waas
     ports:
-      - "5433:5432"
+      - "5435:5432"
     volumes:
       - waas_pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -56,6 +85,10 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
+networks:
+  fixelo_fixelo-network:
+    external: true
 
 volumes:
   waas_pgdata:

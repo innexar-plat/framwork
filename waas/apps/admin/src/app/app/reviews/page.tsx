@@ -16,6 +16,7 @@ import {
   listReviews,
   updateReview,
 } from "@/lib/tenant-api";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
@@ -246,9 +247,11 @@ export default function AppReviewsPage() {
                 <div className="flex items-start gap-3">
                   <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full bg-gray-200">
                     {r.author_photo ? (
-                      <img
+                      <Image
                         src={r.author_photo}
                         alt=""
+                        width={40}
+                        height={40}
                         className="h-full w-full object-cover"
                       />
                     ) : (

@@ -10,7 +10,7 @@ interface TenantLayoutProps {
 
 export function TenantLayout({ children }: TenantLayoutProps) {
   return (
-    <div className="flex min-h-screen flex-col bg-gray-50 md:flex-row">
+    <div className="flex min-h-screen flex-col bg-bg md:flex-row">
       <TenantSidebar />
       <div className="flex flex-1 flex-col min-w-0">
         <TenantHeader />

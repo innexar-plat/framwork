@@ -15,19 +15,26 @@ jest.mock("@/lib/auth-context", () => ({
 }));
 
 jest.mock("@/lib/i18n", () => ({
-  useI18n: () => (key: string) => {
-    const map: Record<string, string> = {
-      "auth.login": "Log in",
-      "auth.email": "Email",
-      "auth.password": "Password",
-      "auth.loginError": "Invalid email or password",
-    };
-    return map[key] ?? key;
-  },
+  useI18n: () => ({
+    t: (key: string) => {
+      const map: Record<string, string> = {
+        "auth.login": "Log in",
+        "auth.email": "Email",
+        "auth.password": "Password",
+        "auth.loginError": "Invalid email or password",
+        "common.loading": "Loading",
+      };
+      return map[key] ?? key;
+    },
+  }),
 }));
 
 jest.mock("@/components/language-switcher", () => ({
   LanguageSwitcher: () => <div data-testid="language-switcher">Lang</div>,
+}));
+
+jest.mock("@/components/ui/theme-toggle", () => ({
+  ThemeToggle: () => <div data-testid="theme-toggle">Theme</div>,
 }));
 
 describe("LoginPage", () => {

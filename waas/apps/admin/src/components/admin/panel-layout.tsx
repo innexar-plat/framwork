@@ -10,7 +10,7 @@ interface PanelLayoutProps {
 
 export function PanelLayout({ children }: PanelLayoutProps) {
   return (
-    <div className="flex min-h-screen flex-col bg-gray-50 md:flex-row">
+    <div className="flex min-h-screen flex-col bg-bg md:flex-row">
       <AdminSidebar />
       <div className="flex flex-1 flex-col min-w-0">
         <AdminHeader />

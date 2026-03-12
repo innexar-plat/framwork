@@ -88,111 +88,85 @@ export default function Home() {
   return (
     <TenantLayout>
       <div className="mx-auto max-w-5xl">
-        <h1 className="text-2xl font-semibold text-gray-900">
+        <h1 className="text-2xl font-bold text-primary font-heading tracking-tight">
           {t("home.title")}
         </h1>
-        <p className="mt-1 text-gray-600">{t("home.subtitle")}</p>
+        <p className="mt-1 text-secondary">{t("home.subtitle")}</p>
 
         {loading && (
-          <p className="mt-4 text-sm text-gray-500">{t("common.loading")}</p>
+          <div className="mt-8 flex items-center gap-3 text-sm text-secondary">
+            <svg className="h-5 w-5 animate-spin text-accent" viewBox="0 0 24 24" fill="none">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            {t("common.loading")}
+          </div>
         )}
 
         {!loading && data && (
           <section className="mt-8" aria-labelledby="overview-heading">
-            <h2 id="overview-heading" className="text-lg font-medium text-gray-900">
+            <h2 id="overview-heading" className="text-lg font-semibold text-primary font-heading">
               {t("dashboard.overview")}
             </h2>
+
+            {/* Stats Grid */}
             <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-                <h3 className="text-sm font-medium text-gray-600">
-                  {t("dashboard.leads")}
-                </h3>
-                <p className="mt-1 text-2xl font-semibold text-gray-900">
-                  {data.leadsTotal}
-                </p>
-                {data.leads.length > 0 && (
+              {[
+                { label: t("dashboard.leads"), value: data.leadsTotal, href: "/app/leads", icon: "👥" },
+                { label: t("dashboard.properties"), value: data.propertiesTotal, href: "/app/properties", icon: "🏠" },
+                { label: t("dashboard.posts"), value: data.posts.length, href: "/app/blog", icon: "✍️" },
+                { label: t("dashboard.schedule"), value: data.scheduleItems.length, href: "/app/schedule", icon: "📅" },
+              ].map(({ label, value, href, icon }) => (
+                <div key={href} className="card p-5 group">
+                  <div className="flex items-center justify-between">
+                    <h3 className="stat-label">{label}</h3>
+                    <span className="text-xl">{icon}</span>
+                  </div>
+                  <p className="mt-2 stat-number">{value}</p>
                   <Link
-                    href="/app/leads"
-                    className="mt-2 text-sm text-blue-600 hover:underline"
+                    href={href}
+                    className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-accent hover:text-accent-hover transition-colors"
                   >
                     {t("dashboard.viewAll")}
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="transition-transform group-hover:translate-x-0.5" aria-hidden>
+                      <polyline points="9 18 15 12 9 6" />
+                    </svg>
                   </Link>
-                )}
-              </div>
-              <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-                <h3 className="text-sm font-medium text-gray-600">
-                  {t("dashboard.properties")}
-                </h3>
-                <p className="mt-1 text-2xl font-semibold text-gray-900">
-                  {data.propertiesTotal}
-                </p>
-                <Link
-                  href="/app/properties"
-                  className="mt-2 text-sm text-blue-600 hover:underline"
-                >
-                  {t("dashboard.viewAll")}
-                </Link>
-              </div>
-              <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-                <h3 className="text-sm font-medium text-gray-600">
-                  {t("dashboard.posts")}
-                </h3>
-                <p className="mt-1 text-2xl font-semibold text-gray-900">
-                  {data.posts.length}
-                </p>
-                {data.posts.length > 0 && (
-                  <Link
-                    href="/app/blog"
-                    className="mt-2 text-sm text-blue-600 hover:underline"
-                  >
-                    {t("dashboard.viewAll")}
-                  </Link>
-                )}
-              </div>
-              <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-                <h3 className="text-sm font-medium text-gray-600">
-                  {t("dashboard.schedule")}
-                </h3>
-                <p className="mt-1 text-2xl font-semibold text-gray-900">
-                  {data.scheduleItems.length}
-                </p>
-                {data.scheduleItems.length > 0 && (
-                  <Link
-                    href="/app/schedule"
-                    className="mt-2 text-sm text-blue-600 hover:underline"
-                  >
-                    {t("dashboard.viewAll")}
-                  </Link>
-                )}
-              </div>
+                </div>
+              ))}
             </div>
+
+            {/* Bottom Section */}
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-                <h3 className="text-sm font-medium text-gray-900">
+              <div className="card p-5">
+                <h3 className="text-sm font-semibold text-primary font-heading">
                   {t("dashboard.quickActions")}
                 </h3>
-                <p className="mt-2 text-sm text-gray-600">
+                <p className="mt-2 text-sm text-secondary">
                   {t("dashboard.goToCatalog")}
                 </p>
                 <Link
                   href="/admin/catalog"
-                  className="mt-3 inline-block rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white hover:bg-gray-800"
+                  className="btn-primary mt-4 text-sm py-2"
                 >
                   {t("nav.catalog")}
                 </Link>
               </div>
-              <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-                <h3 className="text-sm font-medium text-gray-900">
+              <div className="card p-5">
+                <h3 className="text-sm font-semibold text-primary font-heading">
                   {t("dashboard.recentActivity")}
                 </h3>
                 {data.leads.length > 0 ? (
-                  <ul className="mt-2 list-inside list-disc text-sm text-gray-600">
+                  <ul className="mt-3 space-y-2">
                     {data.leads.slice(0, 3).map((lead) => (
-                      <li key={lead.id}>{lead.name || lead.email}</li>
+                      <li key={lead.id} className="flex items-center gap-2 text-sm text-secondary">
+                        <span className="h-1.5 w-1.5 rounded-full bg-accent shrink-0" />
+                        {lead.name || lead.email}
+                      </li>
                     ))}
                   </ul>
                 ) : (
-                  <p className="mt-2 text-sm text-gray-500">
+                  <p className="mt-3 text-sm text-muted">
                     {t("dashboard.noActivity")}
                   </p>
                 )}

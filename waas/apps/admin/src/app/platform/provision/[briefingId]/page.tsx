@@ -63,8 +63,8 @@ export default function ProvisionProgressPage() {
   }, [isPlatformAdmin, briefingId, fetchStatus]);
 
   useEffect(() => {
-    if (!briefingId || !status) return;
-    const done = status.briefing_status === "provisioned" || status.briefing_status === "failed";
+    if (!briefingId) return;
+    const done = status?.briefing_status === "provisioned" || status?.briefing_status === "failed";
     if (done) return;
     const interval = setInterval(fetchStatus, 2000);
     return () => clearInterval(interval);
